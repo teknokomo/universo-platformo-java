@@ -286,32 +286,126 @@ Most features in Universo Platformo follow a three-tier entity relationship patt
 ```
 packages/
 ├── core-frt/              # Core frontend package
+│   ├── README.md          # English documentation
+│   ├── README-RU.md       # Russian documentation
 │   └── base/              # Base implementation
 │       ├── src/
-│       │   └── main/java/
+│       │   ├── main/
+│       │   │   ├── java/
+│       │   │   │   └── pro/universo/core/ui/    # Java package structure
+│       │   │   │       ├── views/               # Vaadin views
+│       │   │   │       ├── components/          # Reusable UI components
+│       │   │   │       └── layouts/             # Layout templates
+│       │   │   └── resources/
+│       │   │       ├── messages_en.properties   # English i18n
+│       │   │       └── messages_ru.properties   # Russian i18n
+│       │   └── test/
 │       └── pom.xml
 ├── core-srv/              # Core backend package
+│   ├── README.md          # English documentation
+│   ├── README-RU.md       # Russian documentation  
 │   └── base/              # Base implementation
 │       ├── src/
-│       │   ├── main/java/
-│       │   │   ├── controller/    # REST endpoints
-│       │   │   ├── service/       # Business logic
-│       │   │   ├── repository/    # Data access
-│       │   │   └── model/         # Domain entities
-│       │   └── resources/
+│       │   ├── main/
+│       │   │   ├── java/
+│       │   │   │   └── pro/universo/core/api/   # Java package structure
+│       │   │   │       ├── controller/          # REST endpoints (@RestController)
+│       │   │   │       ├── service/             # Business logic (@Service)
+│       │   │   │       ├── repository/          # Data access (@Repository)
+│       │   │   │       ├── model/               # JPA entities (@Entity)
+│       │   │   │       ├── dto/                 # Data transfer objects
+│       │   │   │       ├── exception/           # Custom exceptions
+│       │   │   │       └── config/              # Configuration classes
+│       │   │   └── resources/
+│       │   │       ├── application.yml          # Default configuration
+│       │   │       ├── application-dev.yml      # Development profile
+│       │   │       ├── application-prod.yml     # Production profile
+│       │   │       └── db/migration/            # Flyway/Liquibase migrations
+│       │   └── test/
+│       │       └── java/
+│       │           └── pro/universo/core/api/
+│       │               ├── controller/          # Controller tests
+│       │               ├── service/             # Service unit tests
+│       │               └── repository/          # Repository integration tests
 │       └── pom.xml
 ├── clusters-frt/          # Clusters frontend
+│   ├── README.md
+│   ├── README-RU.md
 │   └── base/
 ├── clusters-srv/          # Clusters backend
+│   ├── README.md
+│   ├── README-RU.md
 │   └── base/
-└── [feature]-frt/srv      # Additional features
+└── [feature]-frt/srv      # Additional features (following same pattern)
 ```
+
+**Java Package Naming Convention**:
+
+All Java packages MUST follow the convention: `pro.universo.{feature}.{layer}`
+
+- **Base namespace**: `pro.universo` (reverse domain of universo.pro)
+- **Feature name**: Descriptive feature identifier (e.g., `core`, `clusters`, `metaverses`)
+- **Layer**: `api` for backend services, `ui` for frontend Vaadin code
+- **Sub-packages**: Standard Java layering (controller, service, repository, model, dto, etc.)
+
+Examples:
+- Backend cluster service: `pro.universo.clusters.api.service.ClusterService`
+- Frontend cluster view: `pro.universo.clusters.ui.views.ClusterListView`
+- Core authentication: `pro.universo.core.api.security.AuthenticationService`
 
 **Multi-Module Build Configuration**:
 - Parent POM/build file at repository root
 - Each package is an independent module
-- Shared dependency versions managed at parent level
+- Shared dependency versions managed at parent level using BOM (Bill of Materials) pattern
 - Inter-package dependencies declared explicitly
+- Maven profiles for environment-specific builds (dev, staging, production)
+
+**Dependency Management with BOM Pattern**:
+
+The project MUST use Maven BOM (Bill of Materials) pattern for centralized dependency version management:
+
+1. **Parent POM Dependency Management**
+   - Define all dependency versions in parent `<dependencyManagement>` section
+   - Child modules reference dependencies without version numbers
+   - Prevents version conflicts across modules
+   - Single source of truth for all library versions
+
+2. **Spring Boot BOM Integration**
+   - Import Spring Boot BOM for Spring ecosystem consistency
+   - Import Vaadin BOM for Vaadin component versions
+   - Custom BOM section for Universo-specific dependencies
+
+Example parent POM structure:
+```xml
+<dependencyManagement>
+    <dependencies>
+        <!-- Spring Boot BOM -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-dependencies</artifactId>
+            <version>3.2.0</version>
+            <type>pom</type>
+            <scope>import</scope>
+        </dependency>
+        
+        <!-- Vaadin BOM -->
+        <dependency>
+            <groupId>com.vaadin</groupId>
+            <artifactId>vaadin-bom</artifactId>
+            <version>24.3.0</version>
+            <type>pom</type>
+            <scope>import</scope>
+        </dependency>
+        
+        <!-- Custom dependency versions -->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.7.0</version>
+        </dependency>
+    </dependencies>
+</dependencyManagement>
+```
 
 **Data Access Abstraction Requirements**:
 
@@ -319,18 +413,494 @@ The repository layer MUST provide database abstraction:
 
 1. **Interface-Based Repositories**
    - Define repository interfaces without database specifics
-   - Use standard CRUD method naming
+   - Use standard CRUD method naming (following Spring Data conventions)
    - Return domain entities, not database DTOs
+   - Extend Spring Data JPA Repository interface for basic CRUD
 
 2. **Implementation Isolation**
    - Database-specific code isolated in adapter/implementation classes
    - Supabase client code contained within repository implementations
    - Business logic never imports database-specific libraries
+   - Use JPA standard annotations, avoid vendor-specific features where possible
 
 3. **Configuration Externalization**
    - Database connections via environment variables or configuration files
    - No hardcoded credentials or connection strings
    - Support for multiple configuration profiles (dev, staging, prod)
+   - Use Spring Boot's `application-{profile}.yml` pattern
+
+**JPA Entity Relationship Patterns**:
+
+All JPA entities MUST follow these patterns:
+
+1. **Basic Entity Structure**
+```java
+@Entity
+@Table(name = "clusters")
+public class Cluster {
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
+    
+    @Column(nullable = false, length = 255)
+    private String name;
+    
+    @Column(columnDefinition = "TEXT")
+    private String description;
+    
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+    
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+    
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+    
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
+}
+```
+
+2. **Many-to-Many with Junction Tables**
+```java
+@Entity
+@Table(name = "resource_domain")
+public class ResourceDomain {
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "resource_id", nullable = false)
+    private Resource resource;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "domain_id", nullable = false)
+    private Domain domain;
+    
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+    
+    // UNIQUE constraint on (resource_id, domain_id)
+    @Table(uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"resource_id", "domain_id"})
+    })
+}
+```
+
+3. **CASCADE Delete Relationships**
+   - Use `CascadeType.ALL` or specific types carefully
+   - For parent-child: `@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)`
+   - For junction tables: `@ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})`
+   - Database-level CASCADE on foreign keys as defense-in-depth
+
+4. **JSON/JSONB Column Support**
+   - Use `@Type(JsonBinaryType.class)` with Hibernate Types library
+   - Store flexible metadata without rigid schema
+```java
+@Type(JsonBinaryType.class)
+@Column(columnDefinition = "jsonb")
+private Map<String, Object> metadata;
+```
+
+**Internationalization (i18n) Architecture**:
+
+Frontend and backend MUST support bilingual functionality:
+
+1. **Vaadin Frontend i18n**
+   - Use Java ResourceBundle with locale-specific property files
+   - File naming: `messages.properties` (default), `messages_en.properties`, `messages_ru.properties`
+   - Namespace keys matching React pattern: `clusters.list.title`, `auth.login.button`
+   - Load with `I18NProvider` implementation
+
+Example:
+```java
+// messages_en.properties
+clusters.list.title=Clusters
+clusters.create.button=Create Cluster
+clusters.delete.confirm=Are you sure?
+
+// messages_ru.properties  
+clusters.list.title=Кластеры
+clusters.create.button=Создать кластер
+clusters.delete.confirm=Вы уверены?
+
+// Usage in Vaadin
+String title = getTranslation("clusters.list.title");
+```
+
+2. **Backend i18n for Error Messages**
+   - Use `MessageSource` for validation and error messages
+   - Locale determined from HTTP Accept-Language header
+   - Return localized messages in API responses
+
+3. **Database Content i18n**
+   - For user-created content, consider separate translation tables
+   - Or use JSONB with locale keys: `{"en": "Title", "ru": "Заголовок"}`
+
+**Validation Architecture**:
+
+All input validation MUST follow Bean Validation (JSR-380) standards:
+
+1. **Entity Validation Annotations**
+```java
+@Entity
+public class Cluster {
+    @NotBlank(message = "{cluster.name.required}")
+    @Size(max = 255, message = "{cluster.name.maxlength}")
+    private String name;
+    
+    @Size(max = 5000, message = "{cluster.description.maxlength}")
+    private String description;
+}
+```
+
+2. **DTO Validation**
+```java
+public class CreateClusterRequest {
+    @NotBlank(message = "Name is required")
+    @Size(min = 1, max = 255)
+    private String name;
+    
+    @Size(max = 5000)
+    private String description;
+    
+    // Getters and setters
+}
+```
+
+3. **Controller-Level Validation**
+```java
+@RestController
+@RequestMapping("/api/clusters")
+public class ClusterController {
+    @PostMapping
+    public ResponseEntity<ClusterResponse> create(
+            @Valid @RequestBody CreateClusterRequest request) {
+        // Validation happens automatically
+        // MethodArgumentNotValidException thrown on failure
+    }
+}
+```
+
+4. **Vaadin Binder Validation**
+```java
+Binder<Cluster> binder = new Binder<>(Cluster.class);
+binder.forField(nameField)
+    .asRequired(getTranslation("cluster.name.required"))
+    .withValidator(name -> name.length() <= 255, 
+                   getTranslation("cluster.name.maxlength"))
+    .bind(Cluster::getName, Cluster::setName);
+```
+
+**Error Handling Strategy**:
+
+Consistent error handling across all layers:
+
+1. **Custom Exception Hierarchy**
+```java
+// Base exception
+public class UniversoException extends RuntimeException {
+    private final String errorCode;
+    private final HttpStatus status;
+}
+
+// Domain exceptions
+public class ResourceNotFoundException extends UniversoException {
+    public ResourceNotFoundException(String resource, UUID id) {
+        super(String.format("%s not found: %s", resource, id));
+        this.errorCode = "RESOURCE_NOT_FOUND";
+        this.status = HttpStatus.NOT_FOUND;
+    }
+}
+
+public class ValidationException extends UniversoException {
+    private final Map<String, String> fieldErrors;
+}
+```
+
+2. **Global Exception Handler**
+```java
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+    
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNotFound(
+            ResourceNotFoundException ex, Locale locale) {
+        ErrorResponse error = new ErrorResponse(
+            ex.getErrorCode(),
+            messageSource.getMessage(ex.getErrorCode(), null, locale),
+            ex.getMessage()
+        );
+        return ResponseEntity.status(ex.getStatus()).body(error);
+    }
+    
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ValidationErrorResponse> handleValidation(
+            MethodArgumentNotValidException ex) {
+        // Extract field errors and return structured response
+    }
+}
+```
+
+3. **Vaadin Error Notifications**
+```java
+try {
+    clusterService.create(cluster);
+    Notification.show(
+        getTranslation("cluster.create.success"),
+        3000,
+        Notification.Position.TOP_END
+    ).addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+} catch (UniversoException ex) {
+    Notification.show(
+        getTranslation(ex.getErrorCode()),
+        5000,
+        Notification.Position.TOP_END
+    ).addThemeVariants(NotificationVariant.LUMO_ERROR);
+}
+```
+
+**Security and Rate Limiting**:
+
+Security implementation requirements:
+
+1. **Spring Security Configuration**
+```java
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig {
+    
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) {
+        http
+            .csrf(csrf -> csrf.csrfTokenRepository(
+                CookieCsrfTokenRepository.withHttpOnlyFalse()))
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/api/public/**").permitAll()
+                .requestMatchers("/api/**").authenticated()
+                .anyRequest().permitAll()
+            )
+            .oauth2ResourceServer(oauth2 -> oauth2.jwt());
+        return http.build();
+    }
+}
+```
+
+2. **JWT Token Validation (Supabase)**
+```java
+@Component
+public class SupabaseJwtDecoder implements JwtDecoder {
+    // Validate JWT tokens from Supabase
+    // Verify signature with Supabase public key
+    // Extract user claims
+}
+```
+
+3. **Rate Limiting with Bucket4j**
+```java
+@Configuration
+public class RateLimitConfig {
+    
+    @Bean
+    public Bucket createBucket() {
+        Bandwidth limit = Bandwidth.classic(100, 
+            Refill.intervally(100, Duration.ofMinutes(1)));
+        return Bucket.builder()
+            .addLimit(limit)
+            .build();
+    }
+}
+
+@Component
+public class RateLimitInterceptor implements HandlerInterceptor {
+    @Override
+    public boolean preHandle(HttpServletRequest request, 
+                            HttpServletResponse response, 
+                            Object handler) {
+        // Check bucket, return 429 if exceeded
+    }
+}
+```
+
+4. **CORS Configuration**
+```java
+@Configuration
+public class WebConfig implements WebMvcConfigurer {
+    
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/api/**")
+            .allowedOrigins(
+                environment.getProperty("cors.allowed-origins", "http://localhost:8080")
+            )
+            .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+            .allowedHeaders("*")
+            .allowCredentials(true);
+    }
+}
+```
+
+**Vaadin Component and Routing Patterns**:
+
+Vaadin-specific implementation guidelines:
+
+1. **View Structure**
+```java
+@Route(value = "clusters", layout = MainLayout.class)
+@PageTitle("Clusters")
+@PermitAll
+public class ClusterListView extends VerticalLayout {
+    
+    private final ClusterService clusterService;
+    private final Grid<Cluster> grid = new Grid<>(Cluster.class);
+    
+    public ClusterListView(ClusterService clusterService) {
+        this.clusterService = clusterService;
+        configureGrid();
+        add(createToolbar(), grid);
+    }
+    
+    private void configureGrid() {
+        grid.setColumns("name", "description", "createdAt");
+        grid.addColumn(new ComponentRenderer<>(this::createActions))
+            .setHeader(getTranslation("actions"));
+        grid.getDataProvider().refreshAll();
+    }
+}
+```
+
+2. **Data Provider Integration**
+```java
+// Lazy loading with Spring Data
+grid.setItems(query -> {
+    Pageable pageable = PageRequest.of(
+        query.getPage(), 
+        query.getPageSize(),
+        Sort.by("createdAt").descending()
+    );
+    Page<Cluster> page = clusterService.findAll(pageable);
+    return page.getContent().stream();
+});
+```
+
+3. **Dialog Forms**
+```java
+public class ClusterFormDialog extends Dialog {
+    private final Binder<Cluster> binder = new Binder<>(Cluster.class);
+    private final TextField nameField = new TextField();
+    private final TextArea descriptionField = new TextArea();
+    
+    public ClusterFormDialog() {
+        setHeaderTitle(getTranslation("cluster.form.title"));
+        
+        FormLayout form = new FormLayout();
+        form.add(nameField, descriptionField);
+        add(form);
+        
+        configureBinder();
+        add(createButtons());
+    }
+    
+    private void configureBinder() {
+        binder.forField(nameField)
+            .asRequired(getTranslation("cluster.name.required"))
+            .bind(Cluster::getName, Cluster::setName);
+    }
+}
+```
+
+4. **Context-Aware Navigation**
+```java
+// Navigate with parameters
+UI.getCurrent().navigate(
+    ClusterBoardView.class, 
+    new RouteParameters("clusterId", cluster.getId().toString())
+);
+
+// Access route parameters
+@Route("clusters/:clusterId/board")
+public class ClusterBoardView extends VerticalLayout 
+                             implements BeforeEnterObserver {
+    @Override
+    public void beforeEnter(BeforeEnterEvent event) {
+        UUID clusterId = UUID.fromString(
+            event.getRouteParameters()
+                .get("clusterId")
+                .orElseThrow()
+        );
+        loadCluster(clusterId);
+    }
+}
+```
+
+**React to Vaadin Component Mapping**:
+
+Translation guide for React patterns to Vaadin equivalents:
+
+| React (MUI) | Vaadin | Notes |
+|-------------|--------|-------|
+| `<Button variant="contained">` | `new Button()` with theme | Use `addThemeVariants(ButtonVariant.LUMO_PRIMARY)` |
+| `<TextField />` | `new TextField()` | Built-in validation support |
+| `<DataGrid />` | `new Grid<>()` | Lazy loading, sorting, filtering |
+| `<Dialog />` | `new Dialog()` | Modal dialogs with form support |
+| `<Snackbar />` | `Notification.show()` | Toast-style notifications |
+| `<AppBar />` | `AppLayout` or `Header` | Top navigation bar |
+| `<Drawer />` | `AppLayout` with `DrawerToggle` | Side navigation |
+| `useTranslation()` hook | `getTranslation()` method | i18n access |
+| React Query cache | Vaadin DataProvider | Server-side pagination |
+| React Router | `@Route` annotation | Type-safe navigation |
+
+**Maven Profiles for Environment Management**:
+
+Configuration for different deployment environments:
+
+```xml
+<profiles>
+    <!-- Development Profile -->
+    <profile>
+        <id>dev</id>
+        <activation>
+            <activeByDefault>true</activeByDefault>
+        </activation>
+        <properties>
+            <vaadin.productionMode>false</vaadin.productionMode>
+            <spring.profiles.active>dev</spring.profiles.active>
+        </properties>
+    </profile>
+    
+    <!-- Production Profile -->
+    <profile>
+        <id>production</id>
+        <properties>
+            <vaadin.productionMode>true</vaadin.productionMode>
+            <spring.profiles.active>prod</spring.profiles.active>
+        </properties>
+        <build>
+            <plugins>
+                <plugin>
+                    <groupId>com.vaadin</groupId>
+                    <artifactId>vaadin-maven-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>build-frontend</goal>
+                            </goals>
+                            <phase>compile</phase>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </build>
+    </profile>
+</profiles>
+```
 
 ### React Repository Integration Process *(mandatory)*
 
