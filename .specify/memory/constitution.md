@@ -1,50 +1,185 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+Sync Impact Report - Constitution v1.0.0
+
+Version Change: NEW → 1.0.0 (Initial constitution for Universo Platformo Java)
+
+Principles Established:
+- I. Monorepo Package Architecture
+- II. Bilingual Documentation (NON-NEGOTIABLE)
+- III. Database Abstraction
+- IV. GitHub Workflow Compliance (NON-NEGOTIABLE)
+- V. Technology Stack Integrity
+- VI. Specification-Driven Development (NON-NEGOTIABLE)
+
+Templates Status:
+✅ plan-template.md - Updated with constitution check referencing all six principles
+✅ spec-template.md - Reviewed, aligns with specification principles
+✅ tasks-template.md - Reviewed, aligns with task organization principles
+⚠ Command files in .specify/templates/commands/ - Not present in current repository structure
+
+Follow-up TODOs:
+- Monitor alignment as project evolves and React reference implementation changes
+- Consider adding security and performance principles as project matures
+- Create .specify/templates/commands/ directory when command templates are needed
+
+Rationale for Version 1.0.0:
+- This is the initial constitution establishing foundational governance
+- MAJOR version 1 indicates stable governance framework in place
+- Sets non-negotiable constraints for bilingual docs, GitHub workflow, and spec-driven dev
+-->
+
+# Universo Platformo Java Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Monorepo Package Architecture
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+All functionality MUST be organized into discrete packages within a monorepo structure:
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+- Packages reside in `packages/` directory at repository root
+- Frontend and backend functionality MUST be separated into distinct packages (e.g., `packages/clusters-frt` and `packages/clusters-srv`)
+- Each package MUST contain a root `base/` folder to support future multiple implementations
+- Package management MUST support dependency isolation and independent versioning
+- Packages MUST be self-contained with clear boundaries and minimal cross-package coupling
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+**Rationale**: The monorepo structure enables modular development while maintaining unified versioning and build coordination. The `base/` folder requirement ensures extensibility when multiple technology implementations are needed for the same functional domain.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### II. Bilingual Documentation (NON-NEGOTIABLE)
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+All documentation MUST be provided in both English and Russian:
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+- English is the primary standard and MUST be written first
+- Russian translation MUST exactly mirror English content in structure and line count
+- File naming convention: `README.md` (English) and `README-RU.md` (Russian)
+- Both versions MUST be updated atomically in the same commit
+- Verification MUST confirm identical structure and line count between language versions
+- This principle applies to ALL documentation: README files, specification documents, GitHub Issues descriptions, and inline code comments where appropriate
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+**Rationale**: Bilingual documentation ensures accessibility for the primary stakeholder community spanning English and Russian speakers. Identical structure requirement prevents documentation drift and ensures consistency.
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+### III. Database Abstraction
+
+Database access MUST be abstracted to support multiple database backends:
+
+- Supabase is the PRIMARY database implementation for initial development
+- Data access layer MUST use abstraction patterns (repositories, DAOs) that do not leak vendor-specific APIs
+- Database-specific code MUST be isolated to adapter/implementation layers
+- Core business logic MUST remain database-agnostic
+- Future DBMS support (PostgreSQL, MySQL, MongoDB, etc.) MUST be achievable by implementing new adapters without modifying business logic
+
+**Rationale**: While Supabase is the current choice, the project must remain flexible for future database requirements. Proper abstraction prevents vendor lock-in and enables testing with alternative backends.
+
+### IV. GitHub Workflow Compliance (NON-NEGOTIABLE)
+
+All development work MUST follow strict GitHub workflow procedures:
+
+- Issues MUST be created before implementation work begins
+- Issues MUST follow the template in `.github/instructions/github-issues.md` with bilingual content
+- Labels MUST be applied according to `.github/instructions/github-labels.md` using only existing repository labels
+- Pull Requests MUST follow the template in `.github/instructions/github-pr.md`
+- PRs MUST reference the originating Issue number
+- Specification work MUST precede implementation work
+- All documentation updates MUST follow `.github/instructions/i18n-docs.md` guidelines
+
+**Rationale**: Consistent workflow enables traceability, proper project management, and maintainable history. The Issue-first approach ensures all work is planned and tracked.
+
+### V. Technology Stack Integrity
+
+Technology choices MUST align with Java/Vaadin/Spring ecosystem best practices:
+
+- Frontend MUST use Vaadin framework following its component architecture patterns
+- Backend MUST use Spring Framework (Spring Boot, Spring Data, Spring Security)
+- Do NOT port React-specific patterns or legacy code from Universo Platformo React
+- Authentication MUST use Spring Security with appropriate connectors (e.g., Supabase integration)
+- UI components SHOULD follow Material Design principles adapted to Vaadin
+- Build and dependency management MUST use standard Java tooling (Maven or Gradle)
+- Package management within monorepo SHOULD leverage Java multi-module project patterns
+
+**Rationale**: The Java implementation must embrace Java ecosystem best practices rather than mimicking JavaScript patterns. This ensures maintainability, performance, and community support alignment.
+
+### VI. Specification-Driven Development (NON-NEGOTIABLE)
+
+Implementation MUST NOT begin without proper specification:
+
+- Specifications MUST be created using templates from `.specify/templates/`
+- User stories MUST be prioritized and independently testable
+- Technical design MUST be documented before implementation
+- Each feature MUST have: plan.md, spec.md, and tasks.md in `/specs/[###-feature-name]/` directory
+- Implementation MUST follow task breakdown from tasks.md
+- Changes to specifications MUST trigger review and approval before implementation continues
+
+**Rationale**: Specification-first development ensures stakeholder alignment, reduces rework, and provides living documentation. The template-driven approach ensures consistency across features.
+
+## Technology Stack Standards
+
+**Primary Stack**:
+- **Language**: Java 17+ (LTS version)
+- **Frontend Framework**: Vaadin (current stable version)
+- **Backend Framework**: Spring Boot 3.x with Spring Framework 6.x
+- **Database**: Supabase (PostgreSQL-based) with abstracted data access
+- **Build Tool**: Maven or Gradle (to be determined based on monorepo management needs)
+- **Testing**: JUnit 5, Spring Test, Vaadin TestBench
+
+**Architectural Standards**:
+- RESTful APIs for backend services
+- Component-based UI architecture with Vaadin
+- Dependency injection via Spring
+- Layered architecture: Presentation → Service → Repository → Database
+
+**Prohibited**:
+- Do NOT create `.github/agents/` or AI agent configuration files (user will create when needed)
+- Do NOT create separate `docs/` directory (documentation will be externalized in future)
+- Do NOT replicate unfinished or legacy patterns from Universo Platformo React reference implementation
+
+## Development Workflow
+
+**Issue Creation**:
+1. Analyze Universo Platformo React for new functionality to replicate
+2. Create GitHub Issue following `.github/instructions/github-issues.md`
+3. Apply labels per `.github/instructions/github-labels.md`
+4. Issue must include both English and Russian descriptions
+
+**Specification Phase**:
+1. Create feature specification using `.specify/templates/spec-template.md`
+2. Create implementation plan using `.specify/templates/plan-template.md`
+3. Generate task breakdown using `.specify/templates/tasks-template.md`
+4. Obtain stakeholder approval on specifications
+
+**Implementation Phase**:
+1. Create feature branch from main
+2. Implement tasks in priority order (P1 → P2 → P3)
+3. Write tests first where applicable (test-driven approach preferred but not mandatory)
+4. Update both English and Russian documentation atomically
+5. Create Pull Request following `.github/instructions/github-pr.md`
+
+**Review & Merge**:
+1. Verify constitution compliance (all principles)
+2. Verify bilingual documentation completeness
+3. Verify GitHub workflow compliance
+4. Obtain code review approval
+5. Merge to main branch
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+**Supremacy**: This constitution supersedes all other development practices, guidelines, or conventions. In case of conflict between this constitution and other documents, the constitution prevails.
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+**Amendments**:
+- Amendments require explicit documentation of rationale
+- Version MUST be incremented per semantic versioning:
+  - MAJOR: Backward-incompatible governance changes, principle removals/redefinitions
+  - MINOR: New principles added, material expansions to existing principles
+  - PATCH: Clarifications, wording improvements, non-semantic refinements
+- Amended constitution MUST include Sync Impact Report documenting changes
+- All dependent templates and documentation MUST be updated to reflect amendments
+
+**Compliance Verification**:
+- All Pull Requests MUST verify compliance with constitution principles
+- Constitution violations MUST be justified and documented if approved (complexity tracking in plan.md)
+- Reviewers MUST explicitly confirm constitution compliance before approval
+
+**Living Document**:
+- Constitution should evolve as project matures
+- Regular reviews (quarterly) to assess principle effectiveness
+- Community feedback on governance effectiveness is encouraged
+
+**Version**: 1.0.0 | **Ratified**: 2025-11-16 | **Last Amended**: 2025-11-16

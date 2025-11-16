@@ -31,7 +31,16 @@
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+Verify compliance with Universo Platformo Java Constitution (see `.specify/memory/constitution.md`):
+
+- [ ] **I. Monorepo Package Architecture**: Feature organized into `packages/` with appropriate `base/` folder structure
+- [ ] **II. Bilingual Documentation (NON-NEGOTIABLE)**: English and Russian documentation planned with identical structure
+- [ ] **III. Database Abstraction**: Data access uses abstracted patterns, no vendor lock-in to Supabase
+- [ ] **IV. GitHub Workflow Compliance (NON-NEGOTIABLE)**: Issue created, labels applied, spec-before-implementation followed
+- [ ] **V. Technology Stack Integrity**: Uses Vaadin/Spring patterns, no React legacy code ported
+- [ ] **VI. Specification-Driven Development (NON-NEGOTIABLE)**: Full spec (plan.md, spec.md, tasks.md) completed before implementation
+
+**Violations requiring justification**: [List any principle violations and document why they are necessary]
 
 ## Project Structure
 
