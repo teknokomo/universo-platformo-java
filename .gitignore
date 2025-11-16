@@ -21,6 +21,11 @@
 ## build
 **/dist
 **/build
+**/target
+**/.vaadin
+**/node_modules
+**/.frontend
+**/frontend/generated
 
 ## temp
 **/tmp
