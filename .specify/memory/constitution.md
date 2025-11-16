@@ -1,9 +1,15 @@
 <!--
-Sync Impact Report - Constitution v1.0.0
+Sync Impact Report - Constitution v1.1.0
 
-Version Change: NEW → 1.0.0 (Initial constitution for Universo Platformo Java)
+Version Change: 1.0.0 → 1.1.0 (Audit-driven clarifications and reference implementation link)
 
-Principles Established:
+Changes Made:
+- ADDED: Reference Implementation section linking to teknokomo/universo-platformo-react
+- CLARIFIED: Build Tool preference (Maven for multi-module monorepo)
+- ADDED: Implementation Details subsection (Authentication, UI Theme, Supabase Integration)
+- FIXED: Bilingual documentation compliance (created README-RU.md)
+
+Principles Established (unchanged):
 - I. Monorepo Package Architecture
 - II. Bilingual Documentation (NON-NEGOTIABLE)
 - III. Database Abstraction
@@ -12,23 +18,44 @@ Principles Established:
 - VI. Specification-Driven Development (NON-NEGOTIABLE)
 
 Templates Status:
-✅ plan-template.md - Updated with constitution check referencing all six principles
-✅ spec-template.md - Reviewed, aligns with specification principles
-✅ tasks-template.md - Reviewed, aligns with task organization principles
+✅ plan-template.md - Aligned with all six principles
+✅ spec-template.md - Aligned with specification principles
+✅ tasks-template.md - Aligned with task organization principles
 ⚠ Command files in .specify/templates/commands/ - Not present in current repository structure
+
+Audit Findings Addressed:
+✅ Added explicit React repository reference
+✅ Clarified Maven vs Gradle decision
+✅ Documented Spring Security + Supabase integration approach
+✅ Specified Vaadin Lumo theme strategy
+✅ Created missing README-RU.md (bilingual compliance)
 
 Follow-up TODOs:
 - Monitor alignment as project evolves and React reference implementation changes
 - Consider adding security and performance principles as project matures
 - Create .specify/templates/commands/ directory when command templates are needed
+- Verify GitHub labels exist in repository
+- Begin first feature specification (suggested: Clusters functionality)
 
-Rationale for Version 1.0.0:
-- This is the initial constitution establishing foundational governance
-- MAJOR version 1 indicates stable governance framework in place
-- Sets non-negotiable constraints for bilingual docs, GitHub workflow, and spec-driven dev
+Rationale for Version 1.1.0:
+- MINOR version increment for clarifications and additions
+- Added Implementation Details without changing core principles
+- Enhanced Technology Stack Standards section
+- Addressed audit findings from deep review process
+- Constitution remains backward-compatible with v1.0.0
 -->
 
 # Universo Platformo Java Constitution
+
+## Reference Implementation
+
+This Java implementation is based on the concepts from **Universo Platformo React** reference implementation:
+- **Repository**: https://github.com/teknokomo/universo-platformo-react
+- **Purpose**: Provides conceptual guidance for feature structure and organization
+- **Note**: The React implementation is partially complete and contains legacy Flowise code that will be removed
+- **Adaptation**: Best practices from Java/Vaadin/Spring ecosystem take precedence over direct React pattern porting
+
+**Monitoring Strategy**: Regularly analyze the React repository for new functionality to implement in this Java version, adapting patterns to Java ecosystem conventions.
 
 ## Core Principles
 
@@ -117,7 +144,7 @@ Implementation MUST NOT begin without proper specification:
 - **Frontend Framework**: Vaadin (current stable version)
 - **Backend Framework**: Spring Boot 3.x with Spring Framework 6.x
 - **Database**: Supabase (PostgreSQL-based) with abstracted data access
-- **Build Tool**: Maven or Gradle (to be determined based on monorepo management needs)
+- **Build Tool**: Maven (preferred for monorepo multi-module projects) or Gradle (with multi-project support)
 - **Testing**: JUnit 5, Spring Test, Vaadin TestBench
 
 **Architectural Standards**:
@@ -125,6 +152,11 @@ Implementation MUST NOT begin without proper specification:
 - Component-based UI architecture with Vaadin
 - Dependency injection via Spring
 - Layered architecture: Presentation → Service → Repository → Database
+
+**Implementation Details**:
+- **Authentication**: Spring Security with JWT token validation from Supabase; custom filter chain for token verification
+- **UI Theme**: Vaadin Lumo theme (default) with Material Design-inspired customizations where appropriate
+- **Supabase Integration**: REST API client for authentication and database operations, wrapped in repository abstraction layer
 
 **Prohibited**:
 - Do NOT create `.github/agents/` or AI agent configuration files (user will create when needed)
@@ -182,4 +214,4 @@ Implementation MUST NOT begin without proper specification:
 - Regular reviews (quarterly) to assess principle effectiveness
 - Community feedback on governance effectiveness is encouraged
 
-**Version**: 1.0.0 | **Ratified**: 2025-11-16 | **Last Amended**: 2025-11-16
+**Version**: 1.1.0 | **Ratified**: 2025-11-16 | **Last Amended**: 2025-11-16
