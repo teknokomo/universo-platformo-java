@@ -216,26 +216,6 @@ As a project maintainer, I need a documented process for monitoring the React re
 16. Advanced features (Spaces/Canvases, node systems, UPDL, LangChain integration) will be added after core functionality is stable.
 17. The project will prioritize stability and maintainability over feature parity with React version in the initial phases.
 
-## Assumptions
-
-1. The project will use an enterprise-grade build tool with good monorepo support through multi-module projects.
-2. The project will target current LTS versions of the chosen programming language and frameworks.
-3. Initial setup will focus on one primary database solution, with architecture designed to support other databases in the future.
-4. The frontend framework will provide a cohesive development experience consistent with the backend language.
-5. The backend framework will follow industry-standard patterns for enterprise application development.
-6. The project will follow a "packages" directory structure similar to modern monorepos, adapted for the chosen language conventions.
-7. Authentication will use standard security libraries with custom integration for the chosen database backend.
-8. UI components will use framework-native components or compatible design systems.
-9. The repository will use Git for version control and GitHub for hosting, issues, and pull requests.
-10. All developers working on the project will have access to both English and Russian documentation, but English will be the primary language for code and technical communication.
-11. The standard entity pattern (three-tier hierarchy) will be sufficient for 80%+ of features, with justified exceptions documented in feature specifications.
-12. Feature development velocity will improve over time as patterns and abstractions mature.
-13. The React reference implementation will continue to evolve, requiring periodic reviews to identify new features.
-14. Some React features may not be directly portable to Java/Vaadin and will require significant adaptation or alternative approaches.
-15. Testing will follow industry-standard practices with focus on critical paths rather than 100% coverage.
-16. Advanced features (Spaces/Canvases, node systems, UPDL, LangChain integration) will be added after core functionality is stable.
-17. The project will prioritize stability and maintainability over feature parity with React version in the initial phases.
-
 ## Feature Pattern Standards *(mandatory)*
 
 ### Standard Entity Relationship Pattern
