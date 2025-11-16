@@ -1,48 +1,61 @@
 <!--
-Sync Impact Report - Constitution v1.1.0
+Sync Impact Report - Constitution v2.0.0
 
-Version Change: 1.0.0 → 1.1.0 (Audit-driven clarifications and reference implementation link)
+Version Change: 1.1.0 → 2.0.0 (Major update: Added new NON-NEGOTIABLE principles)
 
 Changes Made:
+- ADDED: Principle VII - Feature Pattern Consistency (NON-NEGOTIABLE)
+- ADDED: Principle VIII - React Repository Alignment (NON-NEGOTIABLE)
+- ADDED: Principle IX - Testing Standards (NON-NEGOTIABLE)
+- ENHANCED: Reference Implementation section with monitoring strategy
+- ENHANCED: Technology Stack Standards with testing frameworks
+
+Principles Established:
+- I. Monorepo Package Architecture (unchanged)
+- II. Bilingual Documentation (NON-NEGOTIABLE) (unchanged)
+- III. Database Abstraction (unchanged)
+- IV. GitHub Workflow Compliance (NON-NEGOTIABLE) (unchanged)
+- V. Technology Stack Integrity (unchanged)
+- VI. Specification-Driven Development (NON-NEGOTIABLE) (unchanged)
+- VII. Feature Pattern Consistency (NON-NEGOTIABLE) **NEW**
+- VIII. React Repository Alignment (NON-NEGOTIABLE) **NEW**
+- IX. Testing Standards (NON-NEGOTIABLE) **NEW**
+
+Rationale for Version 2.0.0:
+- MAJOR version increment for addition of three new NON-NEGOTIABLE principles
+- These principles fundamentally change development requirements
+- All future features must comply with new pattern consistency requirements
+- React repository alignment is now mandatory, not optional
+- Testing standards are now enforceable requirements
+- Breaking change: Existing code may not meet new testing standards
+- Constitution now provides comprehensive governance for all development aspects
+
+Impact Assessment:
+- Existing features may need testing additions to meet 70% coverage requirement
+- All new features must document pattern selection and React alignment
+- Monthly React repository reviews are now mandatory
+- Code reviews must verify pattern consistency and testing compliance
+- Specification template should be updated to include pattern identification section
+
+Follow-up TODOs:
+- Update spec template to include Feature Pattern section
+- Create React Repository Review checklist template
+- Create Testing Compliance checklist for code reviews
+- Add pattern validation to PR review process
+- Document example implementations of standard patterns
+- Create pattern translation guide (React→Java)
+
+Previous Changes (v1.0.0 → v1.1.0):
 - ADDED: Reference Implementation section linking to teknokomo/universo-platformo-react
 - CLARIFIED: Build Tool preference (Maven for multi-module monorepo)
 - ADDED: Implementation Details subsection (Authentication, UI Theme, Supabase Integration)
 - FIXED: Bilingual documentation compliance (created README-RU.md)
 
-Principles Established (unchanged):
-- I. Monorepo Package Architecture
-- II. Bilingual Documentation (NON-NEGOTIABLE)
-- III. Database Abstraction
-- IV. GitHub Workflow Compliance (NON-NEGOTIABLE)
-- V. Technology Stack Integrity
-- VI. Specification-Driven Development (NON-NEGOTIABLE)
-
 Templates Status:
-✅ plan-template.md - Aligned with all six principles
-✅ spec-template.md - Aligned with specification principles
-✅ tasks-template.md - Aligned with task organization principles
+✅ plan-template.md - Requires update for new principles
+⚠ spec-template.md - Requires Feature Pattern section addition
+✅ tasks-template.md - Compatible with all principles
 ⚠ Command files in .specify/templates/commands/ - Not present in current repository structure
-
-Audit Findings Addressed:
-✅ Added explicit React repository reference
-✅ Clarified Maven vs Gradle decision
-✅ Documented Spring Security + Supabase integration approach
-✅ Specified Vaadin Lumo theme strategy
-✅ Created missing README-RU.md (bilingual compliance)
-
-Follow-up TODOs:
-- Monitor alignment as project evolves and React reference implementation changes
-- Consider adding security and performance principles as project matures
-- Create .specify/templates/commands/ directory when command templates are needed
-- Verify GitHub labels exist in repository
-- Begin first feature specification (suggested: Clusters functionality)
-
-Rationale for Version 1.1.0:
-- MINOR version increment for clarifications and additions
-- Added Implementation Details without changing core principles
-- Enhanced Technology Stack Standards section
-- Addressed audit findings from deep review process
-- Constitution remains backward-compatible with v1.0.0
 -->
 
 # Universo Platformo Java Constitution
@@ -137,6 +150,45 @@ Implementation MUST NOT begin without proper specification:
 
 **Rationale**: Specification-first development ensures stakeholder alignment, reduces rework, and provides living documentation. The template-driven approach ensures consistency across features.
 
+### VII. Feature Pattern Consistency (NON-NEGOTIABLE)
+
+All features MUST follow documented entity relationship patterns:
+
+- Standard three-tier pattern (Primary/Secondary/Tertiary entities like Clusters/Domains/Resources) is the default
+- Features MUST identify which pattern they follow in their specification
+- Deviations from standard patterns MUST be explicitly justified in feature specifications
+- Each tier MUST have complete CRUD operations and corresponding UI views
+- Entity relationships MUST be documented with clear diagrams
+- Pattern violations discovered during code review MUST be justified or corrected
+
+**Rationale**: Consistent entity patterns enable code reuse, reduce cognitive load for developers, and provide predictable user experiences across features. The three-tier hierarchy has proven effective in the React reference implementation and should be preserved in the Java version.
+
+### VIII. React Repository Alignment (NON-NEGOTIABLE)
+
+Development MUST maintain alignment with the React reference implementation:
+
+- React repository MUST be analyzed monthly or after major releases
+- New features in React MUST be evaluated for porting to Java version
+- Feature porting decisions (Port/Adapt/Skip/Defer) MUST be documented with rationale
+- Ported features MUST document differences from React implementation
+- Pattern translation guide MUST be maintained showing React→Java equivalents
+- Breaking changes in React reference model MUST trigger specification reviews
+
+**Rationale**: The React repository serves as the conceptual reference for Universo Platformo. While implementation details differ, maintaining alignment ensures both versions serve the same user needs and can evolve together. Documentation of adaptation decisions prevents drift and knowledge loss.
+
+### IX. Testing Standards (NON-NEGOTIABLE)
+
+All code MUST meet testing requirements:
+
+- Service layer code MUST have 70%+ unit test coverage
+- Each REST endpoint MUST have integration tests
+- Each feature MUST have at least one end-to-end UI test for primary workflow
+- All tests MUST pass before code can be merged
+- Tests MUST run in CI/CD environment without manual setup
+- Test doubles (mocks/stubs) MUST be used to isolate external dependencies
+
+**Rationale**: Comprehensive testing ensures reliability, enables confident refactoring, and prevents regressions. The testing pyramid approach (70% unit, 25% integration, 5% UI) provides good coverage while keeping test suites maintainable and fast.
+
 ## Technology Stack Standards
 
 **Primary Stack**:
@@ -145,7 +197,8 @@ Implementation MUST NOT begin without proper specification:
 - **Backend Framework**: Spring Boot 3.x with Spring Framework 6.x
 - **Database**: Supabase (PostgreSQL-based) with abstracted data access
 - **Build Tool**: Maven (preferred for monorepo multi-module projects) or Gradle (with multi-project support)
-- **Testing**: JUnit 5, Spring Test, Vaadin TestBench
+- **Testing**: JUnit 5, Spring Test, Mockito, Vaadin TestBench
+- **Code Quality**: JaCoCo (coverage), Checkstyle (style), SpotBugs (bugs)
 
 **Architectural Standards**:
 - RESTful APIs for backend services
@@ -165,6 +218,13 @@ Implementation MUST NOT begin without proper specification:
 
 ## Development Workflow
 
+**React Repository Monitoring** (Monthly or after major releases):
+1. Review React repository commits, PRs, and issues
+2. Identify new features and architectural changes
+3. Evaluate features using selection criteria (P1/P2/P3)
+4. Document porting decisions in decision log
+5. Update pattern translation guide with new patterns discovered
+
 **Issue Creation**:
 1. Analyze Universo Platformo React for new functionality to replicate
 2. Create GitHub Issue following `.github/instructions/github-issues.md`
@@ -173,23 +233,28 @@ Implementation MUST NOT begin without proper specification:
 
 **Specification Phase**:
 1. Create feature specification using `.specify/templates/spec-template.md`
-2. Create implementation plan using `.specify/templates/plan-template.md`
-3. Generate task breakdown using `.specify/templates/tasks-template.md`
-4. Obtain stakeholder approval on specifications
+2. Identify entity relationship pattern (standard or variation)
+3. Document React feature relationship (if applicable)
+4. Create implementation plan using `.specify/templates/plan-template.md`
+5. Generate task breakdown using `.specify/templates/tasks-template.md`
+6. Obtain stakeholder approval on specifications
 
 **Implementation Phase**:
 1. Create feature branch from main
 2. Implement tasks in priority order (P1 → P2 → P3)
-3. Write tests first where applicable (test-driven approach preferred but not mandatory)
-4. Update both English and Russian documentation atomically
-5. Create Pull Request following `.github/instructions/github-pr.md`
+3. Write tests achieving required coverage (70%+ unit test coverage)
+4. Follow documented entity pattern consistently
+5. Update both English and Russian documentation atomically
+6. Create Pull Request following `.github/instructions/github-pr.md`
 
 **Review & Merge**:
-1. Verify constitution compliance (all principles)
-2. Verify bilingual documentation completeness
-3. Verify GitHub workflow compliance
-4. Obtain code review approval
-5. Merge to main branch
+1. Verify constitution compliance (all nine principles)
+2. Verify pattern consistency (matches documented pattern)
+3. Verify test coverage requirements (70%+ unit, integration tests, UI tests)
+4. Verify bilingual documentation completeness
+5. Verify GitHub workflow compliance
+6. Obtain code review approval
+7. Merge to main branch
 
 ## Governance
 
@@ -214,4 +279,4 @@ Implementation MUST NOT begin without proper specification:
 - Regular reviews (quarterly) to assess principle effectiveness
 - Community feedback on governance effectiveness is encouraged
 
-**Version**: 1.1.0 | **Ratified**: 2025-11-16 | **Last Amended**: 2025-11-16
+**Version**: 2.0.0 | **Ratified**: 2025-11-16 | **Last Amended**: 2025-11-16
