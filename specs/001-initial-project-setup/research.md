@@ -296,16 +296,117 @@ This research documents common React patterns from Universo Platformo React and 
 - **Monitoring**: Prometheus + Grafana for production monitoring (needed for production deployment)
 - **CI/CD pipeline**: GitHub Actions workflows for automated testing and deployment (needed after initial features implemented)
 
+## Additional Research: Best Practices Deep Dive (2025-11-17)
+
+Following the initial research, a comprehensive best practices investigation was conducted using:
+- Vaadin official documentation via Context7 MCP
+- Spring Boot official documentation via Context7 MCP
+- Web research on Supabase integration patterns
+- Industry best practices for Maven multi-module monorepos
+- Testing strategies for Vaadin applications
+
+### Key Findings
+
+1. **Maven Multi-Module Architecture**:
+   - BOM pattern for dependency management (Spring Boot BOM + Vaadin BOM)
+   - Avoid scope import misuse (only for BOMs, not regular libraries)
+   - Use empty `<relativePath/>` in sub-modules for parent resolution
+   - Build profiles for development (fast) and production (optimized)
+   - Maven reactor ensures correct build order for inter-module dependencies
+
+2. **Vaadin Application Patterns**:
+   - Single `@SpringBootApplication` serves both UI and REST API
+   - Constructor injection preferred over field injection
+   - Service layer with `@Transactional` boundaries (not on repositories)
+   - Lazy loading for Grid components with large datasets
+   - Page Object Pattern for TestBench UI tests
+
+3. **Spring Data JPA Best Practices**:
+   - Method name queries for simple conditions (database-agnostic)
+   - `@Query` with JPQL for complex queries (database-agnostic)
+   - Native queries only for PostgreSQL-specific features (mark as such)
+   - Always use `Pageable` for list endpoints
+   - Avoid N+1 queries with JOIN FETCH or EntityGraph
+
+4. **Row-Level Security (RLS) Implementation**:
+   - Shared schema with `tenant_id`/`user_id` + RLS policies (most scalable)
+   - PostgreSQL session variables for passing user context
+   - Index RLS policy columns (critical for performance)
+   - Use `EXPLAIN ANALYZE` to verify index usage
+   - Supabase `auth.uid()` for user-based isolation
+   - Filter at application startup to set session variables
+
+5. **Supabase Integration Strategy**:
+   - Direct PostgreSQL connection for Spring Data JPA
+   - JWT validation with Spring Security OAuth2 Resource Server
+   - Store JWT secrets in environment variables
+   - Use stateless authentication (no server sessions)
+   - Enable SSL for production database connections
+   - RLS policies as database-level security layer
+
+6. **Testing Strategy Refinements**:
+   - 70% unit tests (service layer with Mockito)
+   - 25% integration tests (repositories with @DataJpaTest)
+   - 5% UI tests (critical workflows with TestBench)
+   - Use Testcontainers for real PostgreSQL integration tests
+   - Arrange-Act-Assert (AAA) pattern for test structure
+   - Page Object Pattern for maintainable UI tests
+
+7. **Performance Optimization**:
+   - Index foreign keys and RLS policy columns
+   - Use GIN indexes for array columns
+   - HikariCP connection pooling (Spring Boot default)
+   - Query projections for large entities when only few fields needed
+   - Vaadin production mode with frontend optimization
+   - Monitor slow queries with `pg_stat_statements`
+
+8. **Security Best Practices**:
+   - Method-level security with `@PreAuthorize`
+   - HTTPS enforcement in production
+   - CSRF protection for state-changing operations
+   - Input validation at service layer
+   - Regular dependency updates
+   - Database connection encryption (SSL)
+
+### Documentation Created
+
+A comprehensive best practices document has been created at:
+`.specify/memory/java-vaadin-spring-best-practices.md`
+
+This document includes:
+- Detailed Maven multi-module patterns with code examples
+- Vaadin application architecture patterns
+- Spring Boot integration best practices
+- Database access patterns with RLS implementation
+- Complete testing strategy with examples
+- i18n implementation guide
+- Performance optimization techniques
+- Supabase integration guide
+- Security checklists
+- Migration guide from React patterns
+
+### Impact on Project
+
+These findings validate and enhance the initial technology decisions:
+- Maven multi-module structure confirmed as optimal for monorepo
+- RLS pattern identified as critical for multi-tenant security
+- Testing pyramid established (70/25/5 split)
+- Performance considerations documented for future optimization
+- Clear patterns for React-to-Java migration established
+
 ## Conclusion
 
-All technical unknowns have been resolved. The technology stack is well-defined:
+All technical unknowns have been resolved and enhanced with industry best practices. The technology stack is well-defined:
 - **Language**: Java 17+ (recommend Java 21)
-- **Build**: Maven multi-module project
+- **Build**: Maven multi-module project with BOM pattern
 - **Frontend**: Vaadin 24.3.x with Lumo theme
 - **Backend**: Spring Boot 3.2.x with Spring Framework 6.x
-- **Database**: Supabase (PostgreSQL) via Spring Data JPA
-- **Authentication**: Spring Security with Supabase JWT validation
-- **Testing**: JUnit 5, Mockito, Spring Test, Vaadin TestBench
+- **Database**: Supabase (PostgreSQL) via Spring Data JPA with RLS
+- **Authentication**: Spring Security OAuth2 Resource Server with Supabase JWT
+- **Testing**: JUnit 5, Mockito, Spring Test, Vaadin TestBench, Testcontainers
 - **i18n**: Java ResourceBundle with Vaadin I18NProvider
+- **Security**: Row-Level Security (RLS) + Spring Security + method-level authorization
+
+**Additional Resources**: Comprehensive best practices guide available at `.specify/memory/java-vaadin-spring-best-practices.md`
 
 Ready to proceed to Phase 1 (Design & Contracts).
