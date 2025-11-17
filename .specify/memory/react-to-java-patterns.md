@@ -1280,3 +1280,240 @@ public class ClusterMembersView extends VerticalLayout {
 - [Vaadin Documentation](https://vaadin.com/docs/latest)
 - [Universo Platformo React](https://github.com/teknokomo/universo-platformo-react)
 - [React Architecture Analysis](.specify/memory/react-architecture-analysis.md)
+- [Java/Vaadin/Spring Best Practices](.specify/memory/java-vaadin-spring-best-practices.md)
+
+## Advanced Pattern: Row-Level Security (RLS) Integration
+
+### React Implementation (Not Explicitly Implemented)
+React implementation relies on backend API filtering, but lacks database-level security.
+
+### Java/Spring Implementation with PostgreSQL RLS
+
+**Database Setup**:
+```sql
+-- Enable RLS on clusters table
+ALTER TABLE clusters ENABLE ROW LEVEL SECURITY;
+
+-- Policy: Users can access clusters they own or are members of
+CREATE POLICY cluster_access_policy
+ON clusters
+FOR ALL
+USING (
+    owner_id = current_setting('app.user_id')::uuid
+    OR EXISTS (
+        SELECT 1 FROM cluster_members
+        WHERE cluster_id = clusters.id
+        AND user_id = current_setting('app.user_id')::uuid
+    )
+);
+
+-- Enable RLS on cluster_members table
+ALTER TABLE cluster_members ENABLE ROW LEVEL SECURITY;
+
+-- Policy: Users can see members of clusters they have access to
+CREATE POLICY cluster_members_access_policy
+ON cluster_members
+FOR ALL
+USING (
+    cluster_id IN (
+        SELECT id FROM clusters
+        WHERE owner_id = current_setting('app.user_id')::uuid
+        OR EXISTS (
+            SELECT 1 FROM cluster_members cm
+            WHERE cm.cluster_id = clusters.id
+            AND cm.user_id = current_setting('app.user_id')::uuid
+        )
+    )
+);
+
+-- Create index for performance (critical!)
+CREATE INDEX idx_clusters_owner_id ON clusters(owner_id);
+CREATE INDEX idx_cluster_members_user_cluster 
+    ON cluster_members(user_id, cluster_id);
+```
+
+**Spring Integration**:
+```java
+// Tenant context holder
+@Component
+public class TenantContext {
+    private static final ThreadLocal<UUID> currentUserId = new ThreadLocal<>();
+    
+    public static void setUserId(UUID userId) {
+        currentUserId.set(userId);
+    }
+    
+    public static UUID getUserId() {
+        return currentUserId.get();
+    }
+    
+    public static void clear() {
+        currentUserId.remove();
+    }
+}
+
+// RLS Filter - sets PostgreSQL session variable
+@Component
+@Order(1)
+public class RlsFilter implements Filter {
+    
+    @Autowired
+    private DataSource dataSource;
+    
+    @Override
+    public void doFilter(ServletRequest request, ServletResponse response, 
+                         FilterChain chain) throws IOException, ServletException {
+        try {
+            // Extract user ID from JWT token
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if (auth != null && auth.isAuthenticated()) {
+                UUID userId = extractUserId(auth);
+                TenantContext.setUserId(userId);
+                
+                // Set PostgreSQL session variable for RLS
+                try (Connection conn = dataSource.getConnection();
+                     PreparedStatement stmt = conn.prepareStatement(
+                         "SELECT set_config('app.user_id', ?, false)")) {
+                    stmt.setString(1, userId.toString());
+                    stmt.execute();
+                } catch (SQLException e) {
+                    throw new RuntimeException("Failed to set RLS context", e);
+                }
+            }
+            
+            chain.doFilter(request, response);
+        } finally {
+            TenantContext.clear();
+        }
+    }
+    
+    private UUID extractUserId(Authentication auth) {
+        if (auth.getPrincipal() instanceof Jwt jwt) {
+            String sub = jwt.getSubject();
+            return UUID.fromString(sub);
+        }
+        throw new IllegalStateException("Authentication principal is not a JWT");
+    }
+}
+
+// Repository remains simple - RLS handles filtering automatically
+@Repository
+public interface ClusterRepository extends JpaRepository<Cluster, UUID> {
+    
+    // No explicit user_id filtering needed - RLS handles it!
+    List<Cluster> findAll();
+    
+    // Pagination also works automatically with RLS
+    Page<Cluster> findAll(Pageable pageable);
+    
+    // Search queries work with RLS
+    List<Cluster> findByNameContainingIgnoreCase(String name);
+}
+
+// Service layer doesn't need to worry about filtering
+@Service
+@PreAuthorize("isAuthenticated()")
+public class ClusterService {
+    
+    private final ClusterRepository clusterRepository;
+    
+    public List<ClusterDto> getAllClusters() {
+        // RLS automatically filters to clusters user can access
+        return clusterRepository.findAll().stream()
+            .map(this::toDto)
+            .toList();
+    }
+    
+    @Transactional
+    public ClusterId createCluster(ClusterForm form) {
+        Cluster cluster = new Cluster();
+        cluster.setName(form.getName());
+        cluster.setDescription(form.getDescription());
+        // Automatically set owner from security context
+        cluster.setOwnerId(TenantContext.getUserId());
+        
+        Cluster saved = clusterRepository.save(cluster);
+        return new ClusterId(saved.getId());
+    }
+}
+```
+
+**Performance Considerations**:
+```sql
+-- Monitor RLS query performance
+EXPLAIN ANALYZE
+SELECT * FROM clusters
+WHERE current_setting('app.user_id')::uuid = owner_id;
+
+-- If sequential scan appears, ensure indexes exist
+-- For complex RLS with arrays/lists, use GIN indexes
+CREATE INDEX idx_cluster_member_ids 
+    ON clusters USING GIN (member_ids);
+```
+
+**Best Practices for RLS**:
+
+1. **Always Index RLS Columns**: Critical for performance as data grows
+   - B-tree indexes for scalar columns (`owner_id`, `user_id`)
+   - GIN indexes for array columns (`member_ids[]`)
+
+2. **Test Performance**: Use `EXPLAIN ANALYZE` to verify index usage
+   ```sql
+   SET app.user_id = 'some-uuid';
+   EXPLAIN ANALYZE SELECT * FROM clusters;
+   ```
+
+3. **Defense in Depth**: Use RLS + Spring Security
+   - RLS: Database-level security (last line of defense)
+   - Spring Security: Application-level security (first line of defense)
+   - Both layers together prevent data leaks
+
+4. **Session Variables**: Set once per request, applies to all queries
+   - Use filter/interceptor at application startup
+   - Clear context after request (ThreadLocal cleanup)
+
+5. **Admin Bypass**: Create separate policies for admin roles
+   ```sql
+   CREATE POLICY admin_full_access_policy
+   ON clusters
+   FOR ALL
+   TO admin_role
+   USING (true);
+   ```
+
+6. **Testing**: Verify RLS policies with different users
+   ```sql
+   SET app.user_id = 'user-1-uuid';
+   SELECT * FROM clusters;  -- Should only see user-1's clusters
+   
+   SET app.user_id = 'user-2-uuid';
+   SELECT * FROM clusters;  -- Should only see user-2's clusters
+   ```
+
+**Advantages of RLS Pattern**:
+- ✅ Security enforced at database level (can't be bypassed)
+- ✅ Simpler application code (no explicit filtering)
+- ✅ Works with any query automatically
+- ✅ Prevents SQL injection risks
+- ✅ Supports complex multi-tenant scenarios
+- ✅ Perfect for Supabase integration
+
+**Disadvantages to Consider**:
+- ⚠️ Must index RLS columns for performance
+- ⚠️ Complex policies can impact query performance
+- ⚠️ Requires PostgreSQL (not portable to all databases)
+- ⚠️ Testing requires database-level setup
+
+## Summary
+
+This pattern translation guide provides comprehensive mappings from React/Express patterns to Java/Vaadin/Spring equivalents, with special attention to:
+- Component architecture and state management
+- Data fetching and caching strategies
+- Routing and navigation patterns
+- Member management and RBAC
+- Row-Level Security (RLS) implementation
+- Performance optimization techniques
+
+For detailed best practices and implementation guidelines, see:
+- [Java/Vaadin/Spring Best Practices](.specify/memory/java-vaadin-spring-best-practices.md)
+- [React Architecture Analysis](.specify/memory/react-architecture-analysis.md)
