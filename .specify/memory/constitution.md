@@ -70,6 +70,11 @@ This Java implementation is based on the concepts from **Universo Platformo Reac
 
 **Monitoring Strategy**: Regularly analyze the React repository for new functionality to implement in this Java version, adapting patterns to Java ecosystem conventions.
 
+**Key Reference Documents**:
+- **Architecture Analysis**: `.specify/memory/react-architecture-analysis.md` - Comprehensive analysis of React repository patterns and features
+- **Pattern Translation**: `.specify/memory/react-to-java-patterns.md` - React to Java/Spring/Vaadin pattern translations with code examples
+- **System Patterns**: React repository's `memory-bank/systemPatterns.md` contains proven patterns (RLS, i18n, pagination, testing)
+
 ## Core Principles
 
 ### I. Monorepo Package Architecture
@@ -161,6 +166,22 @@ All features MUST follow documented entity relationship patterns:
 - Entity relationships MUST be documented with clear diagrams
 - Pattern violations discovered during code review MUST be justified or corrected
 
+**Standard Three-Tier Pattern Variants**:
+
+| Feature | Primary | Secondary | Tertiary | Use Case |
+|---------|---------|-----------|----------|----------|
+| Clusters | Clusters | Domains | Resources | Organization structure |
+| Metaverses | Metaverses | Sections | Entities | Virtual world hierarchy |
+| Uniks | Uniks | Spaces | Agents | Workflow/project structure |
+| Projects | Projects | Versions | Assets | Version control |
+
+**Key Pattern Characteristics**:
+- Primary entity: Top-level container with ownership and member management
+- Secondary entity: Organizational subdivision within primary
+- Tertiary entity: Concrete items/resources within secondary
+- Denormalization: Tertiary entities MAY reference primary directly for efficient queries
+- Member Management: Primary entities MUST support role-based access (owner/admin/member)
+
 **Rationale**: Consistent entity patterns enable code reuse, reduce cognitive load for developers, and provide predictable user experiences across features. The three-tier hierarchy has proven effective in the React reference implementation and should be preserved in the Java version.
 
 ### VIII. React Repository Alignment (NON-NEGOTIABLE)
@@ -188,6 +209,91 @@ All code MUST meet testing requirements:
 - Test doubles (mocks/stubs) MUST be used to isolate external dependencies
 
 **Rationale**: Comprehensive testing ensures reliability, enables confident refactoring, and prevents regressions. The testing pyramid approach (70% unit, 25% integration, 5% UI) provides good coverage while keeping test suites maintainable and fast.
+
+## Architectural Patterns (From React Reference)
+
+The following patterns have been identified in the React reference implementation and should be adapted for Java implementation:
+
+### Critical Patterns to Implement
+
+1. **Row-Level Security (RLS) Pattern**
+   - Purpose: Database-enforced multi-tenant data isolation
+   - React: JWT context propagation via TypeORM QueryRunner
+   - Java: Spring Security filter + JPA transaction callbacks
+   - Status: Pattern documented, implementation pending
+   - Reference: `.specify/memory/react-to-java-patterns.md` (RLS section)
+
+2. **Universal Pagination Pattern**
+   - Purpose: Consistent list views with search, sort, filter
+   - React: TanStack Query + Zod schemas + TypeORM
+   - Java: Spring Data Specification + Pageable + Vaadin lazy loading
+   - Status: Pattern documented, implementation pending
+   - Reference: `.specify/memory/react-to-java-patterns.md` (Pagination section)
+
+3. **Three-Tier Entity Hierarchy**
+   - Purpose: Consistent entity relationships across features
+   - Pattern: Primary → Secondary → Tertiary with member management
+   - Examples: Clusters/Domains/Resources, Metaverses/Sections/Entities
+   - Status: Pattern documented in Constitution Principle VII
+   - Reference: `.specify/memory/react-architecture-analysis.md` (Pattern section)
+
+4. **Member Management Pattern**
+   - Purpose: Role-based access control for collaborative features
+   - Roles: owner (full control), admin (management), member (view/contribute)
+   - React: Junction table with enum roles + Passport.js
+   - Java: JPA @IdClass + Spring Security PermissionEvaluator
+   - Status: Pattern documented, implementation pending
+   - Reference: `.specify/memory/react-to-java-patterns.md` (Member Management section)
+
+5. **Centralized i18n Architecture**
+   - Purpose: Single source of truth for translations
+   - React: Namespace registry in @universo/i18n package
+   - Java: ResourceBundle with MessageSource
+   - Status: Pattern documented, partial implementation exists
+   - Reference: `.specify/memory/react-to-java-patterns.md` (i18n section)
+
+### Specialized Patterns for Future Implementation
+
+6. **UPDL Node System**
+   - Purpose: Universal Platform Description Language for multi-platform export
+   - Components: 7 core node types (Space, Entity, Component, Event, Action, Data, Universo)
+   - React Status: Production-ready with AR.js and PlayCanvas exporters
+   - Java Priority: Phase 2-3 (after core features implemented)
+   - Reference: `.specify/memory/react-architecture-analysis.md` (UPDL section)
+
+7. **Template-First Export System**
+   - Purpose: Reusable export templates for multiple technologies
+   - React: Template engine with technology-specific handlers
+   - Java Approach: Thymeleaf or custom template engine + Java 3D libraries
+   - Status: Architecture planned for Phase 3
+   - Reference: React repository `packages/publish-srv`
+
+8. **Real-Time Collaboration Pattern**
+   - Purpose: Multi-user editing and synchronization
+   - React: Colyseus framework for multiplayer
+   - Java: Spring WebSocket + STOMP protocol
+   - Status: Architecture planned for Phase 3
+   - Reference: React repository `packages/multiplayer-colyseus-srv`
+
+### Pattern Implementation Priority
+
+**Phase 1 (Current)**: Foundation
+- [x] Monorepo structure (COMPLETE)
+- [x] Constitution and governance (COMPLETE)
+- [x] Pattern documentation (COMPLETE)
+- [ ] Three-tier entity pattern (first implementation: Clusters)
+- [ ] Member management pattern
+- [ ] Universal pagination pattern
+
+**Phase 2**: Core Features
+- [ ] RLS integration pattern
+- [ ] All primary features (Clusters, Metaverses, Uniks, Projects)
+- [ ] Centralized logging and monitoring
+
+**Phase 3**: Advanced Systems
+- [ ] UPDL schema validation
+- [ ] Export template engine
+- [ ] Real-time collaboration infrastructure
 
 ## Technology Stack Standards
 
