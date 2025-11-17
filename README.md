@@ -150,6 +150,8 @@ This will create optimized builds with Vaadin production mode enabled.
 
 This implementation is based on concepts from [Universo Platformo React](https://github.com/teknokomo/universo-platformo-react). While following the same conceptual architecture, this project adapts patterns to Java ecosystem conventions and best practices.
 
+**Pattern Translation Guide**: See [`.specify/memory/react-to-java-patterns.md`](.specify/memory/react-to-java-patterns.md) for comprehensive mapping of React/Express patterns to Vaadin/Spring equivalents.
+
 **Note**: The React implementation is partially complete and contains legacy code that is being refactored. This Java implementation should focus on clean, enterprise-grade patterns.
 
 ## Contributing
@@ -169,4 +171,5 @@ This implementation is based on concepts from [Universo Platformo React](https:/
 
 - Documentation: [docs.universo.pro](https://docs.universo.pro) (coming soon)
 - Reference Implementation: [Universo Platformo React](https://github.com/teknokomo/universo-platformo-react)
+- Pattern Translation Guide: [`.specify/memory/react-to-java-patterns.md`](.specify/memory/react-to-java-patterns.md)
 - Project Constitution: [`.specify/memory/constitution.md`](.specify/memory/constitution.md)
