@@ -1,0 +1,579 @@
+openapi: 3.0.3
+info:
+  title: Universo Platformo - Clusters API
+  description: |
+    Example API contract for the Clusters feature demonstrating the standard 3-tier entity pattern.
+    This contract shows CRUD operations for Cluster → Domain → Resource hierarchy.
+  version: 1.0.0
+  contact:
+    name: Universo Platformo Team
+    url: https://universo.pro
+
+servers:
+  - url: http://localhost:8080/api
+    description: Development server
+  - url: https://api.universo.pro
+    description: Production server
+
+security:
+  - bearerAuth: []
+
+paths:
+  /clusters:
+    get:
+      summary: List all clusters
+      description: Returns a paginated list of clusters owned by the authenticated user
+      tags:
+        - Clusters
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/SizeParam'
+        - $ref: '#/components/parameters/SortParam'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClusterPage'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    
+    post:
+      summary: Create a new cluster
+      description: Creates a new cluster owned by the authenticated user
+      tags:
+        - Clusters
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateClusterRequest'
+      responses:
+        '201':
+          description: Cluster created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClusterResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /clusters/{clusterId}:
+    get:
+      summary: Get cluster by ID
+      description: Returns a single cluster by its ID
+      tags:
+        - Clusters
+      parameters:
+        - $ref: '#/components/parameters/ClusterIdParam'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClusterResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    
+    put:
+      summary: Update cluster
+      description: Updates an existing cluster
+      tags:
+        - Clusters
+      parameters:
+        - $ref: '#/components/parameters/ClusterIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateClusterRequest'
+      responses:
+        '200':
+          description: Cluster updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClusterResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    
+    delete:
+      summary: Delete cluster
+      description: Soft deletes a cluster (marks as deleted but preserves data)
+      tags:
+        - Clusters
+      parameters:
+        - $ref: '#/components/parameters/ClusterIdParam'
+      responses:
+        '204':
+          description: Cluster deleted successfully
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /clusters/{clusterId}/domains:
+    get:
+      summary: List domains in cluster
+      description: Returns all domains belonging to the specified cluster
+      tags:
+        - Domains
+      parameters:
+        - $ref: '#/components/parameters/ClusterIdParam'
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/SizeParam'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DomainPage'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    
+    post:
+      summary: Create domain in cluster
+      description: Creates a new domain within the specified cluster
+      tags:
+        - Domains
+      parameters:
+        - $ref: '#/components/parameters/ClusterIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDomainRequest'
+      responses:
+        '201':
+          description: Domain created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DomainResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /clusters/{clusterId}/domains/{domainId}:
+    get:
+      summary: Get domain by ID
+      description: Returns a single domain
+      tags:
+        - Domains
+      parameters:
+        - $ref: '#/components/parameters/ClusterIdParam'
+        - $ref: '#/components/parameters/DomainIdParam'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DomainResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Supabase JWT token
+
+  parameters:
+    ClusterIdParam:
+      name: clusterId
+      in: path
+      required: true
+      description: Cluster UUID
+      schema:
+        type: string
+        format: uuid
+    
+    DomainIdParam:
+      name: domainId
+      in: path
+      required: true
+      description: Domain UUID
+      schema:
+        type: string
+        format: uuid
+    
+    PageParam:
+      name: page
+      in: query
+      description: Page number (0-indexed)
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+    
+    SizeParam:
+      name: size
+      in: query
+      description: Page size
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    
+    SortParam:
+      name: sort
+      in: query
+      description: Sort criteria (e.g., "createdAt,desc" or "name,asc")
+      schema:
+        type: string
+
+  schemas:
+    CreateClusterRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+          description: Cluster name
+          example: "Production Environment"
+        description:
+          type: string
+          maxLength: 5000
+          description: Cluster description
+          example: "Production cluster for customer-facing applications"
+        metadata:
+          type: object
+          additionalProperties: true
+          description: Flexible metadata (JSON)
+          example:
+            priority: "high"
+            region: "us-east-1"
+    
+    UpdateClusterRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+          description: Cluster name
+        description:
+          type: string
+          maxLength: 5000
+          description: Cluster description
+        metadata:
+          type: object
+          additionalProperties: true
+          description: Flexible metadata (JSON)
+    
+    ClusterResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Cluster UUID
+        name:
+          type: string
+          description: Cluster name
+        description:
+          type: string
+          nullable: true
+          description: Cluster description
+        ownerId:
+          type: string
+          format: uuid
+          description: Owner user ID
+        metadata:
+          type: object
+          additionalProperties: true
+          nullable: true
+          description: Flexible metadata
+        createdAt:
+          type: string
+          format: date-time
+          description: Creation timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          description: Last update timestamp
+        deletedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: Soft delete timestamp (null if active)
+      example:
+        id: "123e4567-e89b-12d3-a456-426614174000"
+        name: "Production Environment"
+        description: "Production cluster for customer-facing applications"
+        ownerId: "987fcdeb-51a2-43c7-b456-426614174111"
+        metadata:
+          priority: "high"
+          region: "us-east-1"
+        createdAt: "2025-11-17T06:00:00Z"
+        updatedAt: "2025-11-17T06:00:00Z"
+        deletedAt: null
+    
+    ClusterPage:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/ClusterResponse'
+        pageable:
+          $ref: '#/components/schemas/Pageable'
+        totalPages:
+          type: integer
+        totalElements:
+          type: integer
+        last:
+          type: boolean
+        first:
+          type: boolean
+        numberOfElements:
+          type: integer
+        size:
+          type: integer
+        number:
+          type: integer
+        empty:
+          type: boolean
+    
+    CreateDomainRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+          description: Domain name
+          example: "API Services"
+        description:
+          type: string
+          maxLength: 5000
+          description: Domain description
+          example: "Domain for REST API microservices"
+        metadata:
+          type: object
+          additionalProperties: true
+          description: Flexible metadata
+    
+    DomainResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Domain UUID
+        name:
+          type: string
+          description: Domain name
+        description:
+          type: string
+          nullable: true
+          description: Domain description
+        clusterId:
+          type: string
+          format: uuid
+          description: Parent cluster ID
+        metadata:
+          type: object
+          additionalProperties: true
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        deletedAt:
+          type: string
+          format: date-time
+          nullable: true
+    
+    DomainPage:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/DomainResponse'
+        pageable:
+          $ref: '#/components/schemas/Pageable'
+        totalPages:
+          type: integer
+        totalElements:
+          type: integer
+        last:
+          type: boolean
+        first:
+          type: boolean
+        numberOfElements:
+          type: integer
+        size:
+          type: integer
+        number:
+          type: integer
+        empty:
+          type: boolean
+    
+    Pageable:
+      type: object
+      properties:
+        pageNumber:
+          type: integer
+        pageSize:
+          type: integer
+        sort:
+          type: object
+          properties:
+            sorted:
+              type: boolean
+            unsorted:
+              type: boolean
+            empty:
+              type: boolean
+    
+    ErrorResponse:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+          description: Error timestamp
+        status:
+          type: integer
+          description: HTTP status code
+        error:
+          type: string
+          description: HTTP status text
+        message:
+          type: string
+          description: Error message (localized)
+        path:
+          type: string
+          description: Request path
+        errorCode:
+          type: string
+          description: Application-specific error code
+      example:
+        timestamp: "2025-11-17T06:30:00Z"
+        status: 404
+        error: "Not Found"
+        message: "Cluster not found: 123e4567-e89b-12d3-a456-426614174000"
+        path: "/api/clusters/123e4567-e89b-12d3-a456-426614174000"
+        errorCode: "RESOURCE_NOT_FOUND"
+    
+    ValidationErrorResponse:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        status:
+          type: integer
+        error:
+          type: string
+        message:
+          type: string
+        path:
+          type: string
+        errorCode:
+          type: string
+        fieldErrors:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+              message:
+                type: string
+              rejectedValue:
+                type: string
+                nullable: true
+
+  responses:
+    Unauthorized:
+      description: Unauthorized - missing or invalid JWT token
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            timestamp: "2025-11-17T06:30:00Z"
+            status: 401
+            error: "Unauthorized"
+            message: "JWT token is missing or invalid"
+            path: "/api/clusters"
+            errorCode: "UNAUTHORIZED"
+    
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    
+    ValidationError:
+      description: Validation error - invalid request data
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ValidationErrorResponse'
+    
+    InternalError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            timestamp: "2025-11-17T06:30:00Z"
+            status: 500
+            error: "Internal Server Error"
+            message: "An unexpected error occurred"
+            path: "/api/clusters"
+            errorCode: "INTERNAL_ERROR"
