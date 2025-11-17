@@ -57,6 +57,20 @@ This section includes supplementary work completed as part of this PR:
 - [ ] Automated tests pass
 - [ ] No breaking changes introduced
 
+## Architecture Compliance
+
+**REQUIRED**: All PRs MUST verify compliance with modular architecture requirements (Constitution Principle I - NON-NEGOTIABLE):
+
+- [ ] All new functionality is in `packages/` directory
+- [ ] Frontend code is in `-frt` packages (if applicable)
+- [ ] Backend code is in `-srv` packages (if applicable)
+- [ ] Each package has `base/` folder structure
+- [ ] No feature code exists in repository root or other non-package locations
+- [ ] Package naming follows documented conventions
+- [ ] Changes align with modular architecture from [Universo Platformo React](https://github.com/teknokomo/universo-platformo-react)
+
+**Reference**: See `.specify/memory/constitution.md` Principle I for detailed requirements.
+
 <details>
 <summary>In Russian</summary>
 
@@ -87,6 +101,21 @@ This section includes supplementary work completed as part of this PR:
 - [ ] Ручное тестирование завершено
 - [ ] Автоматические тесты проходят
 - [ ] Не внесено критических изменений
+
+## Соответствие архитектуре
+
+**ОБЯЗАТЕЛЬНО**: Все PR ДОЛЖНЫ проверять соответствие требованиям модульной архитектуры (Конституция Принцип I - БЕЗУСЛОВНЫЙ):
+
+- [ ] Весь новый функционал находится в директории `packages/`
+- [ ] Код фронтенда находится в пакетах `-frt` (если применимо)
+- [ ] Код бэкенда находится в пакетах `-srv` (если применимо)
+- [ ] Каждый пакет имеет структуру папки `base/`
+- [ ] Код функционала не существует в корне репозитория или других местах вне пакетов
+- [ ] Именование пакетов следует документированным соглашениям
+- [ ] Изменения соответствуют модульной архитектуре из [Universo Platformo React](https://github.com/teknokomo/universo-platformo-react)
+
+**Справка**: См. `.specify/memory/constitution.md` Принцип I для подробных требований.
+
 </details>
 ```
 

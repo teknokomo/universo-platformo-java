@@ -18,7 +18,15 @@ Universo Platformo Java is a comprehensive full-stack platform implementation us
 
 ## Project Structure
 
-This project follows a monorepo architecture with packages organized under `packages/` directory:
+**⚠️ MANDATORY ARCHITECTURE REQUIREMENT ⚠️**
+
+ALL functionality in this project MUST be implemented as modular packages in the `packages/` directory. Creating functionality outside this structure violates project constitution (Principle I - NON-NEGOTIABLE) and will be rejected in code review.
+
+This modular architecture is based on the proven pattern from [Universo Platformo React](https://github.com/teknokomo/universo-platformo-react) which successfully implements 32+ modular packages. The modular structure is REQUIRED because individual packages will eventually be extracted into separate repositories as the platform matures.
+
+**PROHIBITION**: Feature code MUST NOT be created outside `packages/` directory. Only common infrastructure files (build configuration, root documentation, CI/CD) are exempt.
+
+This project uses a monorepo architecture with packages organized under `packages/` directory:
 
 ```
 universo-platformo-java/
@@ -34,9 +42,9 @@ universo-platformo-java/
 
 ### Package Naming Convention
 
-- `-srv` suffix: Backend/server packages
-- `-frt` suffix: Frontend/UI packages
-- `base/` directory: Base implementation (supports future multiple implementations)
+- `-srv` suffix: Backend/server packages (REQUIRED for all backend functionality)
+- `-frt` suffix: Frontend/UI packages (REQUIRED for all frontend functionality)
+- `base/` directory: Base implementation (REQUIRED in each package, supports future multiple implementations)
 
 ## Getting Started
 
