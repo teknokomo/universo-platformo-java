@@ -559,8 +559,724 @@ public interface ClusterRepository
 | **Auth** | JWT in localStorage | Spring Security OAuth2 |
 | **Build** | Turbo + tsdown | Maven profiles |
 
+## Row-Level Security (RLS) Pattern
+
+### React (TypeORM + PostgreSQL + JWT)
+```typescript
+// Middleware: ensureAuthWithRls
+export function createEnsureAuthWithRls(options: {
+    getDataSource: () => DataSource
+}): RequestHandler {
+    return async (req: Request, res: Response, next: NextFunction) => {
+        // 1. Validate JWT
+        ensureAuth(req, res, async (authErr?: any) => {
+            if (authErr) return next(authErr)
+            
+            // 2. Create dedicated QueryRunner
+            const dataSource = options.getDataSource()
+            const queryRunner = dataSource.createQueryRunner()
+            await queryRunner.connect()
+            
+            // 3. Apply RLS context (set PostgreSQL session variables)
+            const user = (req as any).user
+            await applyRlsContext(queryRunner, user.supabaseAccessToken)
+            
+            // 4. Attach to request
+            (req as RequestWithDbContext).dbContext = {
+                queryRunner,
+                manager: queryRunner.manager
+            }
+            
+            // 5. Cleanup on finish
+            res.on('finish', () => queryRunner.release())
+            next()
+        })
+    }
+}
+
+// Apply RLS context
+async function applyRlsContext(
+    queryRunner: QueryRunner, 
+    accessToken: string
+) {
+    const jwtSecret = new TextEncoder().encode(process.env.SUPABASE_JWT_SECRET!)
+    const { payload } = await jose.jwtVerify(accessToken, jwtSecret)
+    
+    await queryRunner.query(
+        `SELECT set_config('request.jwt.claims', $1::json, true)`,
+        [JSON.stringify(payload)]
+    )
+}
+
+// Usage in routes
+router.get('/clusters/:id', ensureAuthWithRls, async (req, res) => {
+    const manager = req.dbContext.manager
+    const repo = manager.getRepository(Cluster)
+    
+    // Automatic row filtering by RLS policies
+    const cluster = await repo.findOne({ where: { id: req.params.id } })
+    res.json({ success: true, data: cluster })
+})
+```
+
+### Java (Spring Security + JPA + PostgreSQL)
+```java
+// Security Filter for RLS context
+@Component
+public class RlsSecurityFilter extends OncePerRequestFilter {
+    
+    @Autowired
+    private DataSource dataSource;
+    
+    @Autowired
+    private JwtDecoder jwtDecoder;
+    
+    @Override
+    protected void doFilterInternal(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            FilterChain filterChain) throws ServletException, IOException {
+        
+        String token = extractToken(request);
+        if (token != null) {
+            try {
+                Jwt jwt = jwtDecoder.decode(token);
+                
+                // Store JWT claims in request attribute
+                Map<String, Object> claims = jwt.getClaims();
+                request.setAttribute("jwt.claims", claims);
+                
+                // For RLS, we'd use a TransactionCallback to set session vars
+                // This is more complex in Java - typically done per-query
+                
+                filterChain.doFilter(request, response);
+            } catch (JwtException e) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                return;
+            }
+        } else {
+            filterChain.doFilter(request, response);
+        }
+    }
+    
+    private String extractToken(HttpServletRequest request) {
+        String bearerToken = request.getHeader("Authorization");
+        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7);
+        }
+        return null;
+    }
+}
+
+// Custom EntityManager wrapper for RLS
+@Component
+@Scope(value = WebApplicationContext.SCOPE_REQUEST, proxyMode = ScopedProxyMode.TARGET_CLASS)
+public class RlsAwareEntityManager {
+    
+    @PersistenceContext
+    private EntityManager entityManager;
+    
+    @Autowired
+    private HttpServletRequest request;
+    
+    public <T> T executeWithRls(Function<EntityManager, T> operation) {
+        Session session = entityManager.unwrap(Session.class);
+        
+        return session.doReturningWork(connection -> {
+            // Set PostgreSQL session variables
+            Map<String, Object> claims = 
+                (Map<String, Object>) request.getAttribute("jwt.claims");
+            
+            if (claims != null) {
+                String claimsJson = new ObjectMapper().writeValueAsString(claims);
+                try (PreparedStatement stmt = connection.prepareStatement(
+                        "SELECT set_config('request.jwt.claims', ?::json, true)")) {
+                    stmt.setString(1, claimsJson);
+                    stmt.execute();
+                }
+            }
+            
+            // Execute the operation
+            return operation.apply(entityManager);
+        });
+    }
+}
+
+// Usage in service
+@Service
+public class ClusterService {
+    
+    @Autowired
+    private RlsAwareEntityManager rlsEntityManager;
+    
+    public Cluster findById(UUID id) {
+        return rlsEntityManager.executeWithRls(em -> {
+            return em.find(Cluster.class, id);
+        });
+    }
+}
+
+// PostgreSQL RLS Policy (same for both)
+CREATE POLICY cluster_isolation_policy ON clusters
+    USING (
+        created_by = (current_setting('request.jwt.claims')::json->>'sub')
+        OR id IN (
+            SELECT cluster_id FROM cluster_users 
+            WHERE user_id = (current_setting('request.jwt.claims')::json->>'sub')
+        )
+    );
+```
+
+**Note**: RLS in Java is more complex than Node.js because:
+- Java's connection pooling makes per-request session variables tricky
+- TypeORM's QueryRunner model is simpler than JPA's EntityManager
+- Consider using Supabase PostgREST directly for RLS benefits
+- Alternative: Application-level filtering with Spring Security expressions
+
+## Universal Pagination Pattern
+
+### React (TanStack Query + Zod)
+```typescript
+// Backend: Pagination schema
+export const paginationSchema = z.object({
+    page: z.number().min(1).default(1),
+    limit: z.number().min(1).max(100).default(10),
+    search: z.string().optional(),
+    sortBy: z.string().optional(),
+    sortOrder: z.enum(['asc', 'desc']).default('desc')
+})
+
+// Frontend: Paginated hook
+function usePaginatedList<T>(config: {
+    queryKey: any[]
+    endpoint: string
+    params?: PaginationParams
+}) {
+    return useInfiniteQuery({
+        queryKey: config.queryKey,
+        queryFn: async ({ pageParam = 1 }) => {
+            const response = await api.get(config.endpoint, {
+                params: { ...config.params, page: pageParam }
+            })
+            return response.data
+        },
+        initialPageParam: 1,
+        getNextPageParam: (lastPage) => 
+            lastPage.hasMore ? lastPage.page + 1 : undefined
+    })
+}
+
+// Component usage
+function ClusterList() {
+    const { 
+        data, 
+        fetchNextPage, 
+        hasNextPage,
+        isLoading 
+    } = usePaginatedList<Cluster>({
+        queryKey: ['clusters', filters],
+        endpoint: '/api/clusters',
+        params: filters
+    })
+    
+    return (
+        <InfiniteScroll
+            dataLength={data?.pages.length || 0}
+            next={fetchNextPage}
+            hasMore={hasNextPage}
+        >
+            {data?.pages.map(page => 
+                page.items.map(cluster => 
+                    <ClusterCard key={cluster.id} cluster={cluster} />
+                )
+            )}
+        </InfiniteScroll>
+    )
+}
+```
+
+### Java (Spring Data + Vaadin)
+```java
+// DTO for pagination
+@Data
+public class PageRequest {
+    private int page = 1;
+    private int size = 10;
+    private String search;
+    private String sortBy = "createdAt";
+    private Sort.Direction sortOrder = Sort.Direction.DESC;
+    
+    public Pageable toPageable() {
+        return PageRequest.of(
+            page - 1,  // Spring uses 0-based indexing
+            size,
+            Sort.by(sortOrder, sortBy)
+        );
+    }
+}
+
+// Generic specification builder
+public class GenericSpecification<T> {
+    
+    public static <T> Specification<T> buildSearchSpec(
+            String search, 
+            String... fields) {
+        return (root, query, cb) -> {
+            if (search == null || search.isEmpty()) {
+                return cb.conjunction();
+            }
+            
+            List<Predicate> predicates = Arrays.stream(fields)
+                .map(field -> cb.like(
+                    cb.lower(root.get(field)),
+                    "%" + search.toLowerCase() + "%"
+                ))
+                .collect(Collectors.toList());
+            
+            return cb.or(predicates.toArray(new Predicate[0]));
+        };
+    }
+}
+
+// Service implementation
+@Service
+public class ClusterService {
+    
+    @Autowired
+    private ClusterRepository repository;
+    
+    public Page<ClusterResponse> findAll(PageRequest request) {
+        Specification<Cluster> spec = GenericSpecification
+            .buildSearchSpec(request.getSearch(), "name", "description");
+        
+        Page<Cluster> page = repository.findAll(spec, request.toPageable());
+        
+        return page.map(this::toResponse);
+    }
+}
+
+// Vaadin Grid with lazy loading
+@Route("clusters")
+public class ClusterListView extends VerticalLayout {
+    
+    private final ClusterService service;
+    private final Grid<ClusterResponse> grid = new Grid<>();
+    
+    public ClusterListView(ClusterService service) {
+        this.service = service;
+        configureGrid();
+    }
+    
+    private void configureGrid() {
+        grid.addColumn(ClusterResponse::getName).setHeader("Name");
+        grid.addColumn(ClusterResponse::getDescription).setHeader("Description");
+        
+        // Lazy loading with Spring Data
+        grid.setItems(query -> {
+            PageRequest pageRequest = new PageRequest();
+            pageRequest.setPage(query.getPage());
+            pageRequest.setSize(query.getPageSize());
+            
+            // Apply filters from UI
+            if (searchField.getValue() != null) {
+                pageRequest.setSearch(searchField.getValue());
+            }
+            
+            Page<ClusterResponse> page = service.findAll(pageRequest);
+            return page.getContent().stream();
+        });
+        
+        // Enable lazy loading
+        grid.setPageSize(10);
+        grid.setHeight("600px");
+        
+        add(grid);
+    }
+}
+```
+
+## Three-Tier Entity Pattern
+
+### React (TypeORM Entities)
+```typescript
+// Primary: Cluster
+@Entity('clusters')
+export class Cluster {
+    @PrimaryGeneratedColumn('uuid')
+    id: string
+    
+    @Column({ length: 255 })
+    name: string
+    
+    @Column({ length: 5000, nullable: true })
+    description?: string
+    
+    @Column({ name: 'created_by' })
+    createdBy: string
+    
+    @CreateDateColumn({ name: 'created_at' })
+    createdAt: Date
+    
+    @UpdateDateColumn({ name: 'updated_at' })
+    updatedAt: Date
+    
+    @OneToMany(() => Domain, domain => domain.cluster)
+    domains: Domain[]
+    
+    @ManyToMany(() => User, user => user.clusters)
+    @JoinTable({ name: 'cluster_users' })
+    members: User[]
+}
+
+// Secondary: Domain
+@Entity('domains')
+export class Domain {
+    @PrimaryGeneratedColumn('uuid')
+    id: string
+    
+    @Column({ length: 255 })
+    name: string
+    
+    @Column({ name: 'cluster_id' })
+    clusterId: string
+    
+    @ManyToOne(() => Cluster, cluster => cluster.domains)
+    @JoinColumn({ name: 'cluster_id' })
+    cluster: Cluster
+    
+    @OneToMany(() => Resource, resource => resource.domain)
+    resources: Resource[]
+}
+
+// Tertiary: Resource
+@Entity('resources')
+export class Resource {
+    @PrimaryGeneratedColumn('uuid')
+    id: string
+    
+    @Column({ length: 255 })
+    name: string
+    
+    @Column({ length: 100 })
+    type: string
+    
+    @Column({ name: 'domain_id' })
+    domainId: string
+    
+    @Column({ name: 'cluster_id' })
+    clusterId: string  // Denormalized for efficient queries
+    
+    @ManyToOne(() => Domain, domain => domain.resources)
+    @JoinColumn({ name: 'domain_id' })
+    domain: Domain
+}
+```
+
+### Java (JPA Entities)
+```java
+// Primary: Cluster
+@Entity
+@Table(name = "clusters")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class Cluster {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
+    
+    @Column(nullable = false, length = 255)
+    private String name;
+    
+    @Column(length = 5000)
+    private String description;
+    
+    @Column(name = "created_by", nullable = false)
+    private String createdBy;
+    
+    @CreatedDate
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Instant createdAt;
+    
+    @LastModifiedDate
+    @Column(name = "updated_at", nullable = false)
+    private Instant updatedAt;
+    
+    @OneToMany(mappedBy = "cluster", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Domain> domains = new HashSet<>();
+    
+    @ManyToMany
+    @JoinTable(
+        name = "cluster_users",
+        joinColumns = @JoinColumn(name = "cluster_id"),
+        inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private Set<User> members = new HashSet<>();
+}
+
+// Secondary: Domain
+@Entity
+@Table(name = "domains")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class Domain {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
+    
+    @Column(nullable = false, length = 255)
+    private String name;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cluster_id", nullable = false)
+    private Cluster cluster;
+    
+    @OneToMany(mappedBy = "domain", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Resource> resources = new HashSet<>();
+    
+    @CreatedDate
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Instant createdAt;
+}
+
+// Tertiary: Resource
+@Entity
+@Table(name = "resources")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class Resource {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
+    
+    @Column(nullable = false, length = 255)
+    private String name;
+    
+    @Column(nullable = false, length = 100)
+    private String type;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "domain_id", nullable = false)
+    private Domain domain;
+    
+    // Denormalized for efficient queries
+    @Column(name = "cluster_id", nullable = false)
+    private UUID clusterId;
+    
+    @CreatedDate
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Instant createdAt;
+}
+```
+
+## Member Management Pattern
+
+### React (Role-Based Access)
+```typescript
+// Member entity with roles
+export enum ClusterRole {
+    OWNER = 'owner',
+    ADMIN = 'admin',
+    MEMBER = 'member'
+}
+
+@Entity('cluster_users')
+export class ClusterUser {
+    @PrimaryColumn({ name: 'cluster_id' })
+    clusterId: string
+    
+    @PrimaryColumn({ name: 'user_id' })
+    userId: string
+    
+    @Column({ type: 'enum', enum: ClusterRole })
+    role: ClusterRole
+    
+    @CreateDateColumn({ name: 'joined_at' })
+    joinedAt: Date
+}
+
+// Member management component
+function MemberList({ clusterId }: { clusterId: string }) {
+    const { data: members } = useQuery({
+        queryKey: ['cluster-members', clusterId],
+        queryFn: () => api.get(`/clusters/${clusterId}/members`)
+    })
+    
+    const updateRole = useMutation({
+        mutationFn: ({ userId, role }: { userId: string, role: ClusterRole }) =>
+            api.patch(`/clusters/${clusterId}/members/${userId}`, { role })
+    })
+    
+    return (
+        <List>
+            {members?.map(member => (
+                <ListItem key={member.userId}>
+                    <ListItemText primary={member.userName} />
+                    <Select
+                        value={member.role}
+                        onChange={(e) => updateRole.mutate({
+                            userId: member.userId,
+                            role: e.target.value as ClusterRole
+                        })}
+                    >
+                        <MenuItem value="owner">Owner</MenuItem>
+                        <MenuItem value="admin">Admin</MenuItem>
+                        <MenuItem value="member">Member</MenuItem>
+                    </Select>
+                </ListItem>
+            ))}
+        </List>
+    )
+}
+```
+
+### Java (Spring Security + JPA)
+```java
+// Member entity with roles
+@Entity
+@Table(name = "cluster_users")
+@Data
+@IdClass(ClusterUserId.class)
+public class ClusterUser {
+    
+    @Id
+    @Column(name = "cluster_id")
+    private UUID clusterId;
+    
+    @Id
+    @Column(name = "user_id")
+    private String userId;
+    
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ClusterRole role;
+    
+    @CreatedDate
+    @Column(name = "joined_at", nullable = false, updatable = false)
+    private Instant joinedAt;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cluster_id", insertable = false, updatable = false)
+    private Cluster cluster;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", insertable = false, updatable = false)
+    private User user;
+}
+
+@Data
+public class ClusterUserId implements Serializable {
+    private UUID clusterId;
+    private String userId;
+}
+
+public enum ClusterRole {
+    OWNER, ADMIN, MEMBER
+}
+
+// Permission evaluator
+@Component
+public class ClusterPermissionEvaluator implements PermissionEvaluator {
+    
+    @Autowired
+    private ClusterUserRepository clusterUserRepository;
+    
+    @Override
+    public boolean hasPermission(
+            Authentication authentication,
+            Object targetDomainObject,
+            Object permission) {
+        
+        if (!(targetDomainObject instanceof UUID)) {
+            return false;
+        }
+        
+        UUID clusterId = (UUID) targetDomainObject;
+        String userId = authentication.getName();
+        
+        Optional<ClusterUser> member = clusterUserRepository
+            .findByClusterIdAndUserId(clusterId, userId);
+        
+        if (member.isEmpty()) {
+            return false;
+        }
+        
+        // Check permission based on role
+        String requiredPermission = (String) permission;
+        return hasRolePermission(member.get().getRole(), requiredPermission);
+    }
+    
+    private boolean hasRolePermission(ClusterRole role, String permission) {
+        return switch (permission) {
+            case "DELETE" -> role == ClusterRole.OWNER;
+            case "EDIT" -> role == ClusterRole.OWNER || role == ClusterRole.ADMIN;
+            case "VIEW" -> true;  // All members can view
+            default -> false;
+        };
+    }
+    
+    @Override
+    public boolean hasPermission(
+            Authentication authentication,
+            Serializable targetId,
+            String targetType,
+            Object permission) {
+        return hasPermission(authentication, targetId, permission);
+    }
+}
+
+// Vaadin member management view
+@Route("clusters/:id/members")
+public class ClusterMembersView extends VerticalLayout {
+    
+    private final ClusterService clusterService;
+    private final Grid<ClusterMemberDto> grid = new Grid<>();
+    
+    public ClusterMembersView(ClusterService clusterService) {
+        this.service = clusterService;
+        configureGrid();
+    }
+    
+    private void configureGrid() {
+        grid.addColumn(ClusterMemberDto::getUserName)
+            .setHeader(getTranslation("members.name"));
+        
+        grid.addComponentColumn(member -> {
+            Select<ClusterRole> roleSelect = new Select<>();
+            roleSelect.setItems(ClusterRole.values());
+            roleSelect.setValue(member.getRole());
+            roleSelect.addValueChangeListener(e -> {
+                clusterService.updateMemberRole(
+                    member.getClusterId(),
+                    member.getUserId(),
+                    e.getValue()
+                );
+            });
+            return roleSelect;
+        }).setHeader(getTranslation("members.role"));
+        
+        grid.addComponentColumn(member -> {
+            Button removeButton = new Button(
+                new Icon(VaadinIcon.TRASH),
+                e -> removeMember(member)
+            );
+            removeButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
+            return removeButton;
+        }).setHeader(getTranslation("members.actions"));
+        
+        add(grid);
+    }
+}
+```
+
 ## Reference Resources
 
 - [Spring Boot Documentation](https://docs.spring.io/spring-boot/docs/current/reference/html/)
 - [Vaadin Documentation](https://vaadin.com/docs/latest)
 - [Universo Platformo React](https://github.com/teknokomo/universo-platformo-react)
+- [React Architecture Analysis](.specify/memory/react-architecture-analysis.md)

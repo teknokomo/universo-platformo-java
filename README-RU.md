@@ -150,7 +150,11 @@ mvn clean package -Pproduction
 
 Данная реализация основана на концепциях из [Universo Platformo React](https://github.com/teknokomo/universo-platformo-react). Следуя той же концептуальной архитектуре, данный проект адаптирует паттерны к соглашениям и лучшим практикам экосистемы Java.
 
-**Руководство по переводу паттернов**: См. [`.specify/memory/react-to-java-patterns.md`](.specify/memory/react-to-java-patterns.md) для полного соответствия паттернов React/Express эквивалентам Vaadin/Spring.
+**Ключевые справочные документы**:
+- **Руководство по переводу паттернов**: [`.specify/memory/react-to-java-patterns.md`](.specify/memory/react-to-java-patterns.md) - Полное соответствие паттернов React/Express эквивалентам Vaadin/Spring с примерами кода
+- **Анализ архитектуры**: [`.specify/memory/react-architecture-analysis.md`](.specify/memory/react-architecture-analysis.md) - Глубокий анализ структуры репозитория React, паттернов и 32+ реализованных функций
+- **Дорожная карта функций**: [`.specify/memory/feature-implementation-roadmap.md`](.specify/memory/feature-implementation-roadmap.md) - Упорядоченная по приоритетам дорожная карта реализации функций из референсной реализации React
+- **Анализ пробелов**: [`.specify/memory/gap-analysis.md`](.specify/memory/gap-analysis.md) - Детальное сравнение статуса реализаций React и Java
 
 **Примечание**: Реализация на React частично завершена и содержит легаси-код, который рефакторится. Данная реализация на Java должна сосредоточиться на чистых, корпоративных паттернах.
 
