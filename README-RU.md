@@ -150,6 +150,8 @@ mvn clean package -Pproduction
 
 Данная реализация основана на концепциях из [Universo Platformo React](https://github.com/teknokomo/universo-platformo-react). Следуя той же концептуальной архитектуре, данный проект адаптирует паттерны к соглашениям и лучшим практикам экосистемы Java.
 
+**Руководство по переводу паттернов**: См. [`.specify/memory/react-to-java-patterns.md`](.specify/memory/react-to-java-patterns.md) для полного соответствия паттернов React/Express эквивалентам Vaadin/Spring.
+
 **Примечание**: Реализация на React частично завершена и содержит легаси-код, который рефакторится. Данная реализация на Java должна сосредоточиться на чистых, корпоративных паттернах.
 
 ## Участие в разработке
@@ -169,4 +171,5 @@ mvn clean package -Pproduction
 
 - Документация: [docs.universo.pro](https://docs.universo.pro) (скоро)
 - Референсная реализация: [Universo Platformo React](https://github.com/teknokomo/universo-platformo-react)
+- Руководство по переводу паттернов: [`.specify/memory/react-to-java-patterns.md`](.specify/memory/react-to-java-patterns.md)
 - Конституция проекта: [`.specify/memory/constitution.md`](.specify/memory/constitution.md)
