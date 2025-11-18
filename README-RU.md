@@ -159,6 +159,9 @@ mvn clean package -Pproduction
 Данная реализация основана на концепциях из [Universo Platformo React](https://github.com/teknokomo/universo-platformo-react). Следуя той же концептуальной архитектуре, данный проект адаптирует паттерны к соглашениям и лучшим практикам экосистемы Java.
 
 **Ключевые справочные документы**:
+- **Валидация лучших практик**: [`.specify/memory/best-practices-validation-2025-11-18.md`](.specify/memory/best-practices-validation-2025-11-18.md) - Комплексная валидация архитектуры на соответствие лучшим отраслевым практикам (Оценка: 95/100)
+- **Руководство по Spring Modulith**: [`.specify/memory/spring-modulith-verification-guide.md`](.specify/memory/spring-modulith-verification-guide.md) - Руководство по автоматизированной верификации архитектуры
+- **Лучшие практики Java/Vaadin/Spring**: [`.specify/memory/java-vaadin-spring-best-practices.md`](.specify/memory/java-vaadin-spring-best-practices.md) - Комплексные лучшие практики для технологического стека
 - **Руководство по переводу паттернов**: [`.specify/memory/react-to-java-patterns.md`](.specify/memory/react-to-java-patterns.md) - Полное соответствие паттернов React/Express эквивалентам Vaadin/Spring с примерами кода
 - **Анализ архитектуры**: [`.specify/memory/react-architecture-analysis.md`](.specify/memory/react-architecture-analysis.md) - Глубокий анализ структуры репозитория React, паттернов и 32+ реализованных функций
 - **Дорожная карта функций**: [`.specify/memory/feature-implementation-roadmap.md`](.specify/memory/feature-implementation-roadmap.md) - Упорядоченная по приоритетам дорожная карта реализации функций из референсной реализации React

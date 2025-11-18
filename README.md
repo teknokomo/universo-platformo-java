@@ -159,6 +159,9 @@ This will create optimized builds with Vaadin production mode enabled.
 This implementation is based on concepts from [Universo Platformo React](https://github.com/teknokomo/universo-platformo-react). While following the same conceptual architecture, this project adapts patterns to Java ecosystem conventions and best practices.
 
 **Key Reference Documents**:
+- **Best Practices Validation**: [`.specify/memory/best-practices-validation-2025-11-18.md`](.specify/memory/best-practices-validation-2025-11-18.md) - Comprehensive validation of architecture against industry best practices (Score: 95/100)
+- **Spring Modulith Guide**: [`.specify/memory/spring-modulith-verification-guide.md`](.specify/memory/spring-modulith-verification-guide.md) - Guide for automated architecture verification
+- **Java/Vaadin/Spring Best Practices**: [`.specify/memory/java-vaadin-spring-best-practices.md`](.specify/memory/java-vaadin-spring-best-practices.md) - Comprehensive best practices for the technology stack
 - **Pattern Translation Guide**: [`.specify/memory/react-to-java-patterns.md`](.specify/memory/react-to-java-patterns.md) - Comprehensive mapping of React/Express patterns to Vaadin/Spring equivalents with code examples
 - **Architecture Analysis**: [`.specify/memory/react-architecture-analysis.md`](.specify/memory/react-architecture-analysis.md) - Deep analysis of React repository structure, patterns, and 32+ implemented features
 - **Feature Roadmap**: [`.specify/memory/feature-implementation-roadmap.md`](.specify/memory/feature-implementation-roadmap.md) - Priority-ordered roadmap for implementing features from React reference
