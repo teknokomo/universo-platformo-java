@@ -1,8 +1,9 @@
 # Java/Vaadin/Spring Best Practices for Universo Platformo
 
-**Version**: 1.0.0  
-**Date**: 2025-11-17  
-**Research Sources**: Vaadin Official Docs, Spring Boot Documentation, Web Research
+**Version**: 1.1.0  
+**Date**: 2025-11-18  
+**Research Sources**: Vaadin Official Docs, Spring Boot Documentation, Spring Modulith, Context7, Web Research  
+**Change Log**: v1.1.0 - Added Spring Modulith verification section, build profiles documentation
 
 ## Overview
 
