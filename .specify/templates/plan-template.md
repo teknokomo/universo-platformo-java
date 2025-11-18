@@ -33,12 +33,15 @@
 
 Verify compliance with Universo Platformo Java Constitution (see `.specify/memory/constitution.md`):
 
-- [ ] **I. Monorepo Package Architecture**: Feature organized into `packages/` with appropriate `base/` folder structure
+- [ ] **I. Monorepo Package Architecture (NON-NEGOTIABLE)**: Feature organized into `packages/` with appropriate `base/` folder structure, frontend/backend separated, no feature code outside packages
 - [ ] **II. Bilingual Documentation (NON-NEGOTIABLE)**: English and Russian documentation planned with identical structure
 - [ ] **III. Database Abstraction**: Data access uses abstracted patterns, no vendor lock-in to Supabase
 - [ ] **IV. GitHub Workflow Compliance (NON-NEGOTIABLE)**: Issue created, labels applied, spec-before-implementation followed
 - [ ] **V. Technology Stack Integrity**: Uses Vaadin/Spring patterns, no React legacy code ported
 - [ ] **VI. Specification-Driven Development (NON-NEGOTIABLE)**: Full spec (plan.md, spec.md, tasks.md) completed before implementation
+- [ ] **VII. Feature Pattern Consistency (NON-NEGOTIABLE)**: Follows documented entity relationship patterns, deviations justified
+- [ ] **VIII. React Repository Alignment (NON-NEGOTIABLE)**: React repository analyzed for applicable patterns, adaptation decisions documented
+- [ ] **IX. Testing Standards (NON-NEGOTIABLE)**: Testing strategy defined with 70%+ unit coverage goal, integration tests, UI tests
 
 **Violations requiring justification**: [List any principle violations and document why they are necessary]
 

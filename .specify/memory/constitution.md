@@ -1,4 +1,70 @@
 <!--
+Sync Impact Report - Constitution v2.1.0
+
+Version Change: 2.0.0 → 2.1.0 (Minor update: Strengthened Principle I enforcement)
+
+Changes Made:
+- ENHANCED: Principle I - Monorepo Package Architecture now marked as NON-NEGOTIABLE
+- ADDED: PROHIBITION clause explicitly forbidding non-modular implementation
+- ADDED: ENFORCEMENT clause defining code review verification requirements
+- ADDED: REFERENCE PATTERN clause linking to React repository as architectural model
+- ENHANCED: Rationale expanded to explain future package extraction requirement
+
+Principles Status:
+- I. Monorepo Package Architecture (NON-NEGOTIABLE) **ENHANCED**
+- II. Bilingual Documentation (NON-NEGOTIABLE) (unchanged)
+- III. Database Abstraction (unchanged)
+- IV. GitHub Workflow Compliance (NON-NEGOTIABLE) (unchanged)
+- V. Technology Stack Integrity (unchanged)
+- VI. Specification-Driven Development (NON-NEGOTIABLE) (unchanged)
+- VII. Feature Pattern Consistency (NON-NEGOTIABLE) (unchanged)
+- VIII. React Repository Alignment (NON-NEGOTIABLE) (unchanged)
+- IX. Testing Standards (NON-NEGOTIABLE) (unchanged)
+
+Rationale for Version 2.1.0:
+- MINOR version increment for material expansion to existing principle
+- Principle I elevated to NON-NEGOTIABLE status (same level as II, IV, VI, VII, VIII, IX)
+- Added explicit prohibition to prevent misunderstanding
+- Added enforcement mechanisms for code reviews
+- This change makes it IMPOSSIBLE to implement functionality non-modularly
+- Aligns with user requirement for UNAMBIGUOUS and UNCONDITIONAL modular architecture
+
+Impact Assessment:
+- All future PRs must verify modular architecture compliance
+- Code reviews must explicitly check package structure
+- No functionality can be added outside packages/ directory
+- Strengthens alignment with React repository reference pattern
+- Makes future package extraction into separate repositories feasible
+- Existing implementation already compliant (no code changes needed)
+
+Follow-up Actions Required:
+- Update README.md and README-RU.md with architecture warnings
+- Update .github/instructions/github-pr.md with architecture compliance checklist
+- Create .github/checklists/architecture-compliance.md for reviewers
+- Update spec template to include architecture compliance section
+- Verify all changes maintain bilingual consistency
+
+Previous Changes (v2.0.0):
+- ADDED: Principle VII - Feature Pattern Consistency (NON-NEGOTIABLE)
+- ADDED: Principle VIII - React Repository Alignment (NON-NEGOTIABLE)
+- ADDED: Principle IX - Testing Standards (NON-NEGOTIABLE)
+- ENHANCED: Reference Implementation section with monitoring strategy
+- ENHANCED: Technology Stack Standards with testing frameworks
+
+Previous Changes (v1.0.0 → v1.1.0):
+- ADDED: Reference Implementation section linking to teknokomo/universo-platformo-react
+- CLARIFIED: Build Tool preference (Maven for multi-module monorepo)
+- ADDED: Implementation Details subsection (Authentication, UI Theme, Supabase Integration)
+- FIXED: Bilingual documentation compliance (created README-RU.md)
+
+Templates Status:
+✅ plan-template.md - Requires update for strengthened Principle I
+⚠ spec-template.md - Requires Architecture Compliance section addition
+✅ tasks-template.md - Compatible with all principles
+⚠ github-pr.md - Requires Architecture Compliance checklist addition
+-->
+
+<!--
 Sync Impact Report - Constitution v2.0.0
 
 Version Change: 1.1.0 → 2.0.0 (Major update: Added new NON-NEGOTIABLE principles)
@@ -11,7 +77,7 @@ Changes Made:
 - ENHANCED: Technology Stack Standards with testing frameworks
 
 Principles Established:
-- I. Monorepo Package Architecture (unchanged)
+- I. Monorepo Package Architecture (changed to NON-NEGOTIABLE in v2.1.0)
 - II. Bilingual Documentation (NON-NEGOTIABLE) (unchanged)
 - III. Database Abstraction (unchanged)
 - IV. GitHub Workflow Compliance (NON-NEGOTIABLE) (unchanged)
@@ -77,7 +143,7 @@ This Java implementation is based on the concepts from **Universo Platformo Reac
 
 ## Core Principles
 
-### I. Monorepo Package Architecture
+### I. Monorepo Package Architecture (NON-NEGOTIABLE)
 
 All functionality MUST be organized into discrete packages within a monorepo structure:
 
@@ -87,7 +153,18 @@ All functionality MUST be organized into discrete packages within a monorepo str
 - Package management MUST support dependency isolation and independent versioning
 - Packages MUST be self-contained with clear boundaries and minimal cross-package coupling
 
-**Rationale**: The monorepo structure enables modular development while maintaining unified versioning and build coordination. The `base/` folder requirement ensures extensibility when multiple technology implementations are needed for the same functional domain.
+**PROHIBITION**: Functionality MUST NOT be implemented outside the `packages/` directory structure. Common infrastructure files (build configuration, root-level documentation, CI/CD workflows) are exempt, but ALL feature code MUST reside in appropriate packages. Creating functionality outside this structure violates project constitution and will be rejected in code review.
+
+**ENFORCEMENT**: Code reviews MUST verify that:
+- All new functionality is in `packages/` directory
+- Frontend and backend are properly separated into `-frt` and `-srv` packages
+- Each package has `base/` folder structure
+- No feature code exists in repository root or other non-package locations
+- Package naming follows documented conventions
+
+**REFERENCE PATTERN**: This architecture mirrors the proven pattern from **Universo Platformo React** repository (https://github.com/teknokomo/universo-platformo-react) which successfully implements 32+ modular packages. The Java implementation MUST maintain this modular structure to enable future package extraction into separate repositories.
+
+**Rationale**: The monorepo structure enables modular development while maintaining unified versioning and build coordination. The `base/` folder requirement ensures extensibility when multiple technology implementations are needed for the same functional domain. Strict modular architecture is essential because individual packages will eventually be extracted into separate repositories as the platform matures.
 
 ### II. Bilingual Documentation (NON-NEGOTIABLE)
 
@@ -385,4 +462,4 @@ The following patterns have been identified in the React reference implementatio
 - Regular reviews (quarterly) to assess principle effectiveness
 - Community feedback on governance effectiveness is encouraged
 
-**Version**: 2.0.0 | **Ratified**: 2025-11-16 | **Last Amended**: 2025-11-16
+**Version**: 2.1.0 | **Ratified**: 2025-11-16 | **Last Amended**: 2025-11-17
