@@ -1,11 +1,23 @@
 # Tasks: Initial Universo Platformo Java Project Setup
 
-**Input**: Design documents from `/specs/001-initial-project-setup/`
+**Feature**: 001-initial-project-setup  
+**Input**: Design documents from `/specs/001-initial-project-setup/`  
 **Prerequisites**: plan.md, spec.md, research.md, data-model.md, contracts/, quickstart.md
 
 **Tests**: No tests in this feature (documentation and setup only - no runtime code)
 
 **Organization**: Tasks are grouped by user story to enable independent implementation and testing of each story.
+
+**Important Context**:
+This tasks.md covers ONLY the initial project setup (feature 001). This is the foundation phase that establishes:
+- Repository structure and build configuration
+- Documentation standards (bilingual EN/RU)
+- GitHub workflows and issue management
+- Core package structure (`packages/core-frt`, `packages/core-srv`)
+- Pattern documentation for future features
+- Integration process with React reference repository
+
+**After completing this feature**, subsequent features (authentication, Clusters, Metaverses, Uniks, Spaces/Canvases, node libraries, etc.) will each have their own specification directories and tasks.md files following this same pattern. See "Future Features Roadmap" section at the end of this document for the complete feature list based on [Universo Platformo React](https://github.com/teknokomo/universo-platformo-react).
 
 ## Format: `- [ ] [ID] [P?] [Story?] Description`
 
@@ -457,3 +469,163 @@ All 100 tasks follow the required format:
 - ✅ `- [ ] T008 [P] [US1] Update README.md with comprehensive...` (Story task with parallel)
 - ✅ `- [ ] T016 [US1] Update README-RU.md with identical...` (Story task, not parallel)
 - ✅ `- [ ] T085 [P] Update CONTRIBUTING.md...` (Polish - no story label)
+
+---
+
+## Future Features Roadmap
+
+This tasks.md covers **Feature 001: Initial Project Setup** only. Based on the Universo Platformo React reference implementation and project requirements, the following features will need separate specification and task documents:
+
+### Phase 1: Foundation (After Initial Setup)
+
+**002: Authentication & Authorization System** (P0 - Critical)
+- Spring Security configuration with Supabase JWT validation
+- User session management and profile storage
+- Login/logout UI with Vaadin
+- Password reset flow and protected routes
+- Member management pattern foundation
+- **Estimated**: 2-3 weeks, ~60-80 tasks
+
+**003: Clusters Feature** (P0 - Critical - First Business Feature)
+- Three-tier pattern: Clusters → Domains → Resources
+- Member management with roles (owner/admin/member)
+- Full CRUD operations with pagination, search, sort
+- RLS (Row-Level Security) integration
+- Reference implementation for all future features
+- **Estimated**: 4-6 weeks, ~100-120 tasks
+
+### Phase 2: Core Features
+
+**004: User Profiles & Workspaces** (P1 - High)
+- User profile CRUD operations
+- Avatar upload and management
+- Workspace management and switching
+- User preferences and settings
+- **Estimated**: 1-2 weeks, ~40-50 tasks
+
+**005: Metaverses Feature** (P1 - High)
+- Three-tier pattern: Metaverses → Sections → Entities
+- 3D scene management and configuration
+- Entity placement and manipulation
+- Integration with UPDL system (future)
+- **Estimated**: 3-4 weeks, ~80-100 tasks
+
+**006: Uniks Feature** (P1 - High)
+- Three-tier pattern: Uniks → Spaces → Agents
+- Workflow/project management
+- Canvas framework for visual programming
+- Agent collaboration system
+- **Estimated**: 4-5 weeks, ~100-120 tasks
+
+**007: Projects Feature** (P1 - High)
+- Three-tier pattern: Projects → Versions → Assets
+- Version control and history tracking
+- Asset upload and storage
+- Branch/merge concepts (simplified Git)
+- **Estimated**: 3-4 weeks, ~80-100 tasks
+
+**008: Row-Level Security (RLS) Enhancement** (P1 - High)
+- Database-level security policies
+- JWT context propagation to PostgreSQL
+- Integration with all existing features
+- Performance optimization and testing
+- **Estimated**: 2-3 weeks, ~50-60 tasks
+
+### Phase 3: Specialized Features
+
+**009: UPDL Schema & Validation System** (P2 - Medium)
+- Universal Platform Description Language schema
+- JSON schema validation service
+- Node type definitions (Space, Entity, Component, Event, Action, Data)
+- UPDL document storage and versioning
+- REST API for UPDL operations
+- **Estimated**: 3-4 weeks, ~70-80 tasks
+
+**010: Node Library - LangChain Integration** (P2 - Medium)
+- LangChain nodes for AI workflows
+- Integration with LangChain Java library
+- Node types: LLM, Chain, Agent, Tool, Memory
+- Visual node editor support
+- **Estimated**: 3-4 weeks, ~60-80 tasks
+
+**011: Node Library - UPDL Base Nodes** (P2 - Medium)
+- Core UPDL node implementations
+- Space, Entity, Component nodes
+- Transform, Material, Physics nodes
+- Event and Action system
+- **Estimated**: 2-3 weeks, ~50-60 tasks
+
+**012: Space Builder Foundation** (P2 - Medium)
+- 3D scene visual editor UI
+- Object placement and manipulation
+- Property inspector and hierarchy tree
+- UPDL export from editor
+- Integration with Java 3D libraries
+- **Estimated**: 6-8 weeks, ~120-150 tasks
+
+**013: Export/Publish System** (P2 - Medium)
+- Template engine for multi-platform export
+- AR.js exporter (web-based AR)
+- HTML/CSS export
+- Export preview functionality
+- Publication URL management
+- **Estimated**: 4-6 weeks, ~80-100 tasks
+
+**014: Analytics Dashboard** (P2 - Medium)
+- Event tracking infrastructure
+- Usage analytics and metrics
+- User behavior tracking
+- Performance monitoring
+- Export analytics reports
+- **Estimated**: 2-3 weeks, ~40-50 tasks
+
+### Phase 4: Advanced Features
+
+**015: Real-Time Collaboration** (P3 - Low)
+- WebSocket infrastructure (Spring WebSocket)
+- Real-time synchronization engine
+- Presence indicators and collaborative editing
+- Conflict resolution system
+- **Estimated**: 6-8 weeks, ~100-120 tasks
+
+### Total Project Estimation
+
+- **Initial Setup (001)**: 7-11 weeks (this document)
+- **Phase 1 Foundation**: 7-11 weeks (002-003)
+- **Phase 2 Core Features**: 13-18 weeks (004-008)
+- **Phase 3 Specialized**: 20-28 weeks (009-014)
+- **Phase 4 Advanced**: 6-8 weeks (015)
+
+**Total**: 53-76 weeks (12-18 months for full feature parity)
+
+### Notes on Future Features
+
+1. **Modular Package Structure**: Each feature will create separate `-frt` and `-srv` packages in `packages/` directory
+2. **Based on React Reference**: All features inspired by [Universo Platformo React](https://github.com/teknokomo/universo-platformo-react)
+3. **Optimized for Java**: Not direct ports - adapted to Java/Vaadin/Spring best practices
+4. **Progressive Delivery**: Each feature independently testable and deliverable
+5. **Constitution Compliance**: All features follow established patterns and principles
+
+### Creating New Feature Specifications
+
+When ready to implement a new feature:
+
+1. Create feature directory: `specs/[###-feature-name]/`
+2. Generate specification files:
+   - `spec.md` - User stories with priorities (P1, P2, P3)
+   - `plan.md` - Technical implementation plan
+   - `research.md` - Technology decisions and alternatives
+   - `data-model.md` - Entity relationships and patterns
+   - `contracts/` - API endpoint definitions
+   - `quickstart.md` - Testing scenarios
+   - `tasks.md` - Generated from /speckit.tasks command
+3. Follow the same structure and format as feature 001
+4. Ensure all tasks follow strict checklist format with [Story] labels
+
+### References
+
+- **React Repository**: https://github.com/teknokomo/universo-platformo-react
+- **Feature Roadmap**: `.specify/memory/feature-implementation-roadmap.md`
+- **React Analysis**: `.specify/memory/react-architecture-analysis.md`
+- **Constitution**: `.specify/memory/constitution.md`
+- **Pattern Guide**: `.specify/memory/react-to-java-patterns.md`
