@@ -109,8 +109,9 @@ universo-platformo-java/
 │               │   ├── application-prod.yml
 │               │   └── db/migration/
 │               └── test/java/
-└── docs/                            # Future: will be moved to separate repository
 ```
+
+**Note**: No `docs/` directory is created in this repository. Documentation will be hosted separately at docs.universo.pro (FR-009).
 
 **Structure Decision**: Maven multi-module monorepo pattern selected for Universo Platformo Java. This structure:
 - Follows Java enterprise conventions with standard Maven directory layout

@@ -1,7 +1,7 @@
 # Tasks: Initial Universo Platformo Java Project Setup
 
 **Feature**: 001-initial-project-setup  
-**Input**: Design documents from `/specs/001-initial-project-setup/`  
+**Input**: Design documents from `.specify/specs/001-initial-project-setup/`  
 **Prerequisites**: plan.md, spec.md, research.md, data-model.md, contracts/, quickstart.md
 
 **Tests**: No tests in this feature (documentation and setup only - no runtime code)
@@ -33,7 +33,7 @@ Maven multi-module monorepo with packages structure:
 - Root: `pom.xml`, `README.md`, `README-RU.md`
 - Packages: `packages/{feature}-{srv|frt}/base/`
 - GitHub: `.github/instructions/`, `.github/ISSUE_TEMPLATE/`, `.github/PULL_REQUEST_TEMPLATE/`
-- Specs: `specs/###-feature-name/`
+- Specs: `.specify/specs/###-feature-name/`
 
 ---
 
@@ -41,8 +41,8 @@ Maven multi-module monorepo with packages structure:
 
 **Purpose**: Initialize repository organizational structure
 
-- [ ] T001 Create root `.gitignore` file with Java/Maven/IDE exclusions in `/home/runner/work/universo-platformo-java/universo-platformo-java/.gitignore`
-- [ ] T002 [P] Create parent `pom.xml` with BOM dependency management in `/home/runner/work/universo-platformo-java/universo-platformo-java/pom.xml`
+- [ ] T001 Create root `.gitignore` file with Java/Maven/IDE exclusions in `.gitignore`
+- [ ] T002 [P] Create parent `pom.xml` with BOM dependency management in `pom.xml`
 - [ ] T003 [P] Create Maven wrapper files (mvnw, mvnw.cmd) in repository root
 - [ ] T004 [P] Create `.editorconfig` for consistent code formatting in repository root
 
@@ -54,9 +54,9 @@ Maven multi-module monorepo with packages structure:
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T005 Review and understand existing README.md structure in `/home/runner/work/universo-platformo-java/universo-platformo-java/README.md`
-- [ ] T006 Review and understand existing README-RU.md structure in `/home/runner/work/universo-platformo-java/universo-platformo-java/README-RU.md`
-- [ ] T007 Review GitHub instructions in `/home/runner/work/universo-platformo-java/universo-platformo-java/.github/instructions/`
+- [ ] T005 Review and understand existing README.md structure in `README.md`
+- [ ] T006 Review and understand existing README-RU.md structure in `README-RU.md`
+- [ ] T007 Review GitHub instructions in `.github/instructions/`
 
 **Checkpoint**: Foundation reviewed - user story implementation can now begin in parallel
 
@@ -70,18 +70,18 @@ Maven multi-module monorepo with packages structure:
 
 ### Implementation for User Story 1
 
-- [ ] T008 [P] [US1] Update README.md with comprehensive project overview in `/home/runner/work/universo-platformo-java/universo-platformo-java/README.md`
-- [ ] T009 [P] [US1] Update README.md with technology stack details in `/home/runner/work/universo-platformo-java/universo-platformo-java/README.md`
-- [ ] T010 [P] [US1] Update README.md with project structure explanation in `/home/runner/work/universo-platformo-java/universo-platformo-java/README.md`
-- [ ] T011 [P] [US1] Update README.md with getting started instructions in `/home/runner/work/universo-platformo-java/universo-platformo-java/README.md`
-- [ ] T012 [P] [US1] Update README.md with configuration guidelines in `/home/runner/work/universo-platformo-java/universo-platformo-java/README.md`
-- [ ] T013 [P] [US1] Update README.md with development workflow section in `/home/runner/work/universo-platformo-java/universo-platformo-java/README.md`
-- [ ] T014 [P] [US1] Update README.md with contribution guidelines in `/home/runner/work/universo-platformo-java/universo-platformo-java/README.md`
-- [ ] T015 [P] [US1] Update README.md with reference to React repository in `/home/runner/work/universo-platformo-java/universo-platformo-java/README.md`
-- [ ] T016 [US1] Update README-RU.md with identical structure and content in Russian in `/home/runner/work/universo-platformo-java/universo-platformo-java/README-RU.md`
+- [ ] T008 [P] [US1] Update README.md with comprehensive project overview in `README.md`
+- [ ] T009 [P] [US1] Update README.md with technology stack details in `README.md`
+- [ ] T010 [P] [US1] Update README.md with project structure explanation in `README.md`
+- [ ] T011 [P] [US1] Update README.md with getting started instructions in `README.md`
+- [ ] T012 [P] [US1] Update README.md with configuration guidelines in `README.md`
+- [ ] T013 [P] [US1] Update README.md with development workflow section in `README.md`
+- [ ] T014 [P] [US1] Update README.md with contribution guidelines in `README.md`
+- [ ] T015 [P] [US1] Update README.md with reference to React repository in `README.md`
+- [ ] T016 [US1] Update README-RU.md with identical structure and content in Russian in `README-RU.md`
 - [ ] T017 [US1] Verify README.md and README-RU.md have identical line counts and section structure
-- [ ] T018 [P] [US1] Create ARCHITECTURE.md documenting monorepo pattern and package structure in `/home/runner/work/universo-platformo-java/universo-platformo-java/ARCHITECTURE.md`
-- [ ] T019 [US1] Create ARCHITECTURE-RU.md with Russian translation in `/home/runner/work/universo-platformo-java/universo-platformo-java/ARCHITECTURE-RU.md`
+- [ ] T018 [P] [US1] Create ARCHITECTURE.md documenting monorepo pattern and package structure in `ARCHITECTURE.md`
+- [ ] T019 [US1] Create ARCHITECTURE-RU.md with Russian translation in `ARCHITECTURE-RU.md`
 
 **Checkpoint**: Repository documentation complete - developers can understand project architecture
 
@@ -95,14 +95,15 @@ Maven multi-module monorepo with packages structure:
 
 ### Implementation for User Story 2
 
-- [ ] T020 [P] [US2] Review existing github-labels.md in `/home/runner/work/universo-platformo-java/universo-platformo-java/.github/instructions/github-labels.md`
-- [ ] T021 [P] [US2] Review existing github-issues.md in `/home/runner/work/universo-platformo-java/universo-platformo-java/.github/instructions/github-issues.md`
-- [ ] T022 [P] [US2] Create or update bug report issue template in `/home/runner/work/universo-platformo-java/universo-platformo-java/.github/ISSUE_TEMPLATE/bug_report.md`
-- [ ] T023 [P] [US2] Create or update feature request issue template in `/home/runner/work/universo-platformo-java/universo-platformo-java/.github/ISSUE_TEMPLATE/feature_request.md`
-- [ ] T024 [P] [US2] Create or update documentation issue template in `/home/runner/work/universo-platformo-java/universo-platformo-java/.github/ISSUE_TEMPLATE/documentation.md`
+- [ ] T020 [P] [US2] Review existing github-labels.md in `.github/instructions/github-labels.md`
+- [ ] T021 [P] [US2] Review existing github-issues.md in `.github/instructions/github-issues.md`
+- [ ] T022 [P] [US2] Create or update bug report issue template in `.github/ISSUE_TEMPLATE/bug_report.md`
+- [ ] T023 [P] [US2] Create or update feature request issue template in `.github/ISSUE_TEMPLATE/feature_request.md`
+- [ ] T024 [P] [US2] Create or update documentation issue template in `.github/ISSUE_TEMPLATE/documentation.md`
 - [ ] T025 [US2] Ensure all issue templates support bilingual content (English primary, Russian in collapsible section)
-- [ ] T026 [P] [US2] Document GitHub label creation process in `/home/runner/work/universo-platformo-java/universo-platformo-java/.github/instructions/github-labels.md`
-- [ ] T027 [US2] Create labels.json configuration file with all required labels in `/home/runner/work/universo-platformo-java/universo-platformo-java/.github/labels.json`
+- [ ] T026 [P] [US2] Document GitHub label creation process in `.github/instructions/github-labels.md`
+- [ ] T027 [US2] Create labels.json configuration file with all required labels in `.github/labels.json`
+- [ ] T027a [P] [US2] Create or update Pull Request template in `.github/PULL_REQUEST_TEMPLATE.md` with bilingual support
 
 **Checkpoint**: Issue management system configured - work can be tracked effectively
 
@@ -116,17 +117,17 @@ Maven multi-module monorepo with packages structure:
 
 ### Implementation for User Story 5
 
-- [ ] T028 [P] [US5] Create PATTERNS.md documenting standard 3-tier entity pattern (Primary→Secondary→Tertiary) in `/home/runner/work/universo-platformo-java/universo-platformo-java/PATTERNS.md`
-- [ ] T029 [P] [US5] Document Clusters/Domains/Resources example in PATTERNS.md in `/home/runner/work/universo-platformo-java/universo-platformo-java/PATTERNS.md`
-- [ ] T030 [P] [US5] Document Metaverses/Sections/Entities variation in PATTERNS.md in `/home/runner/work/universo-platformo-java/universo-platformo-java/PATTERNS.md`
-- [ ] T031 [P] [US5] Document extended hierarchy pattern (Uniks 4+ tiers) in PATTERNS.md in `/home/runner/work/universo-platformo-java/universo-platformo-java/PATTERNS.md`
-- [ ] T032 [P] [US5] Document simplified pattern (1-2 tiers) with justification requirements in PATTERNS.md in `/home/runner/work/universo-platformo-java/universo-platformo-java/PATTERNS.md`
-- [ ] T033 [P] [US5] Document many-to-many relationship pattern with junction tables in PATTERNS.md in `/home/runner/work/universo-platformo-java/universo-platformo-java/PATTERNS.md`
-- [ ] T034 [P] [US5] Document JPA entity relationship patterns with code examples in PATTERNS.md in `/home/runner/work/universo-platformo-java/universo-platformo-java/PATTERNS.md`
-- [ ] T035 [P] [US5] Document standard entity attributes (id, timestamps, metadata) in PATTERNS.md in `/home/runner/work/universo-platformo-java/universo-platformo-java/PATTERNS.md`
-- [ ] T036 [P] [US5] Document repository pattern with Spring Data JPA in PATTERNS.md in `/home/runner/work/universo-platformo-java/universo-platformo-java/PATTERNS.md`
-- [ ] T037 [P] [US5] Document service layer pattern with transaction management in PATTERNS.md in `/home/runner/work/universo-platformo-java/universo-platformo-java/PATTERNS.md`
-- [ ] T038 [US5] Create PATTERNS-RU.md with Russian translation in `/home/runner/work/universo-platformo-java/universo-platformo-java/PATTERNS-RU.md`
+- [ ] T028 [P] [US5] Create PATTERNS.md documenting standard 3-tier entity pattern (Primary→Secondary→Tertiary) in `PATTERNS.md`
+- [ ] T029 [P] [US5] Document Clusters/Domains/Resources example in PATTERNS.md in `PATTERNS.md`
+- [ ] T030 [P] [US5] Document Metaverses/Sections/Entities variation in PATTERNS.md in `PATTERNS.md`
+- [ ] T031 [P] [US5] Document extended hierarchy pattern (Uniks 4+ tiers) in PATTERNS.md in `PATTERNS.md`
+- [ ] T032 [P] [US5] Document simplified pattern (1-2 tiers) with justification requirements in PATTERNS.md in `PATTERNS.md`
+- [ ] T033 [P] [US5] Document many-to-many relationship pattern with junction tables in PATTERNS.md in `PATTERNS.md`
+- [ ] T034 [P] [US5] Document JPA entity relationship patterns with code examples in PATTERNS.md in `PATTERNS.md`
+- [ ] T035 [P] [US5] Document standard entity attributes (id, timestamps, metadata) in PATTERNS.md in `PATTERNS.md`
+- [ ] T036 [P] [US5] Document repository pattern with Spring Data JPA in PATTERNS.md in `PATTERNS.md`
+- [ ] T037 [P] [US5] Document service layer pattern with transaction management in PATTERNS.md in `PATTERNS.md`
+- [ ] T038 [US5] Create PATTERNS-RU.md with Russian translation in `PATTERNS-RU.md`
 - [ ] T039 [US5] Verify PATTERNS.md and PATTERNS-RU.md have identical structure
 
 **Checkpoint**: Feature patterns documented - developers know how to implement features consistently
@@ -141,25 +142,25 @@ Maven multi-module monorepo with packages structure:
 
 ### Implementation for User Story 3
 
-- [ ] T040 [US3] Update parent pom.xml with Spring Boot 3.2.x and Vaadin 24.3.x BOM imports in `/home/runner/work/universo-platformo-java/universo-platformo-java/pom.xml`
-- [ ] T041 [US3] Configure Maven modules section in parent pom.xml listing all packages in `/home/runner/work/universo-platformo-java/universo-platformo-java/pom.xml`
-- [ ] T042 [US3] Configure Maven profiles (dev, production) in parent pom.xml in `/home/runner/work/universo-platformo-java/universo-platformo-java/pom.xml`
-- [ ] T043 [P] [US3] Create core-srv package directory structure in `/home/runner/work/universo-platformo-java/universo-platformo-java/packages/core-srv/base/`
-- [ ] T044 [P] [US3] Create core-srv base pom.xml in `/home/runner/work/universo-platformo-java/universo-platformo-java/packages/core-srv/base/pom.xml`
-- [ ] T045 [P] [US3] Create core-srv base Java package structure in `/home/runner/work/universo-platformo-java/universo-platformo-java/packages/core-srv/base/src/main/java/pro/universo/core/api/`
-- [ ] T046 [P] [US3] Create core-srv Spring Boot application class in `/home/runner/work/universo-platformo-java/universo-platformo-java/packages/core-srv/base/src/main/java/pro/universo/core/api/UniversoPlatformoApplication.java`
-- [ ] T047 [P] [US3] Create core-srv application.yml with profiles in `/home/runner/work/universo-platformo-java/universo-platformo-java/packages/core-srv/base/src/main/resources/application.yml`
-- [ ] T048 [P] [US3] Create core-srv application-dev.yml in `/home/runner/work/universo-platformo-java/universo-platformo-java/packages/core-srv/base/src/main/resources/application-dev.yml`
-- [ ] T049 [P] [US3] Create core-srv application-prod.yml in `/home/runner/work/universo-platformo-java/universo-platformo-java/packages/core-srv/base/src/main/resources/application-prod.yml`
-- [ ] T050 [P] [US3] Create core-srv README.md in English in `/home/runner/work/universo-platformo-java/universo-platformo-java/packages/core-srv/README.md`
-- [ ] T051 [US3] Create core-srv README-RU.md in Russian in `/home/runner/work/universo-platformo-java/universo-platformo-java/packages/core-srv/README-RU.md`
-- [ ] T052 [P] [US3] Create core-frt package directory structure in `/home/runner/work/universo-platformo-java/universo-platformo-java/packages/core-frt/base/`
-- [ ] T053 [P] [US3] Create core-frt base pom.xml with Vaadin dependencies in `/home/runner/work/universo-platformo-java/universo-platformo-java/packages/core-frt/base/pom.xml`
-- [ ] T054 [P] [US3] Create core-frt base Java package structure in `/home/runner/work/universo-platformo-java/universo-platformo-java/packages/core-frt/base/src/main/java/pro/universo/core/ui/`
-- [ ] T055 [P] [US3] Create core-frt MainLayout view in `/home/runner/work/universo-platformo-java/universo-platformo-java/packages/core-frt/base/src/main/java/pro/universo/core/ui/layouts/MainLayout.java`
-- [ ] T056 [P] [US3] Create core-frt HomeView in `/home/runner/work/universo-platformo-java/universo-platformo-java/packages/core-frt/base/src/main/java/pro/universo/core/ui/views/HomeView.java`
-- [ ] T057 [P] [US3] Create core-frt README.md in English in `/home/runner/work/universo-platformo-java/universo-platformo-java/packages/core-frt/README.md`
-- [ ] T058 [US3] Create core-frt README-RU.md in Russian in `/home/runner/work/universo-platformo-java/universo-platformo-java/packages/core-frt/README-RU.md`
+- [ ] T040 [US3] Update parent pom.xml with Spring Boot 3.2.x and Vaadin 24.3.x BOM imports in `pom.xml`
+- [ ] T041 [US3] Configure Maven modules section in parent pom.xml listing all packages in `pom.xml`
+- [ ] T042 [US3] Configure Maven profiles (dev, production) in parent pom.xml in `pom.xml`
+- [ ] T043 [P] [US3] Create core-srv package directory structure in `packages/core-srv/base/`
+- [ ] T044 [P] [US3] Create core-srv base pom.xml in `packages/core-srv/base/pom.xml`
+- [ ] T045 [P] [US3] Create core-srv base Java package structure in `packages/core-srv/base/src/main/java/pro/universo/core/api/`
+- [ ] T046 [P] [US3] Create core-srv Spring Boot application class in `packages/core-srv/base/src/main/java/pro/universo/core/api/UniversoPlatformoApplication.java`
+- [ ] T047 [P] [US3] Create core-srv application.yml with profiles in `packages/core-srv/base/src/main/resources/application.yml`
+- [ ] T048 [P] [US3] Create core-srv application-dev.yml in `packages/core-srv/base/src/main/resources/application-dev.yml`
+- [ ] T049 [P] [US3] Create core-srv application-prod.yml in `packages/core-srv/base/src/main/resources/application-prod.yml`
+- [ ] T050 [P] [US3] Create core-srv README.md in English in `packages/core-srv/README.md`
+- [ ] T051 [US3] Create core-srv README-RU.md in Russian in `packages/core-srv/README-RU.md`
+- [ ] T052 [P] [US3] Create core-frt package directory structure in `packages/core-frt/base/`
+- [ ] T053 [P] [US3] Create core-frt base pom.xml with Vaadin dependencies in `packages/core-frt/base/pom.xml`
+- [ ] T054 [P] [US3] Create core-frt base Java package structure in `packages/core-frt/base/src/main/java/pro/universo/core/ui/`
+- [ ] T055 [P] [US3] Create core-frt MainLayout view in `packages/core-frt/base/src/main/java/pro/universo/core/ui/layouts/MainLayout.java`
+- [ ] T056 [P] [US3] Create core-frt HomeView in `packages/core-frt/base/src/main/java/pro/universo/core/ui/views/HomeView.java`
+- [ ] T057 [P] [US3] Create core-frt README.md in English in `packages/core-frt/README.md`
+- [ ] T058 [US3] Create core-frt README-RU.md in Russian in `packages/core-frt/README-RU.md`
 - [ ] T059 [US3] Build project and verify compilation success with `mvn clean install`
 - [ ] T060 [US3] Test application startup with `mvn spring-boot:run` in core-srv
 
@@ -175,17 +176,17 @@ Maven multi-module monorepo with packages structure:
 
 ### Implementation for User Story 6
 
-- [ ] T061 [P] [US6] Create REACT-INTEGRATION.md documenting monitoring process in `/home/runner/work/universo-platformo-java/universo-platformo-java/REACT-INTEGRATION.md`
-- [ ] T062 [P] [US6] Document feature selection criteria (P1/P2/P3) in REACT-INTEGRATION.md in `/home/runner/work/universo-platformo-java/universo-platformo-java/REACT-INTEGRATION.md`
-- [ ] T063 [P] [US6] Document evaluation questions for React features in REACT-INTEGRATION.md in `/home/runner/work/universo-platformo-java/universo-platformo-java/REACT-INTEGRATION.md`
-- [ ] T064 [P] [US6] Document direct porting strategy in REACT-INTEGRATION.md in `/home/runner/work/universo-platformo-java/universo-platformo-java/REACT-INTEGRATION.md`
-- [ ] T065 [P] [US6] Document adapted porting strategy in REACT-INTEGRATION.md in `/home/runner/work/universo-platformo-java/universo-platformo-java/REACT-INTEGRATION.md`
-- [ ] T066 [P] [US6] Document alternative implementation strategy in REACT-INTEGRATION.md in `/home/runner/work/universo-platformo-java/universo-platformo-java/REACT-INTEGRATION.md`
-- [ ] T067 [P] [US6] Document React-to-Vaadin component mapping table in REACT-INTEGRATION.md in `/home/runner/work/universo-platformo-java/universo-platformo-java/REACT-INTEGRATION.md`
-- [ ] T068 [P] [US6] Document pattern translation guide (React hooks → Vaadin patterns) in REACT-INTEGRATION.md in `/home/runner/work/universo-platformo-java/universo-platformo-java/REACT-INTEGRATION.md`
-- [ ] T069 [P] [US6] Create template for feature comparison document in REACT-INTEGRATION.md in `/home/runner/work/universo-platformo-java/universo-platformo-java/REACT-INTEGRATION.md`
-- [ ] T070 [P] [US6] Create template for porting decision log in REACT-INTEGRATION.md in `/home/runner/work/universo-platformo-java/universo-platformo-java/REACT-INTEGRATION.md`
-- [ ] T071 [US6] Create REACT-INTEGRATION-RU.md with Russian translation in `/home/runner/work/universo-platformo-java/universo-platformo-java/REACT-INTEGRATION-RU.md`
+- [ ] T061 [P] [US6] Create REACT-INTEGRATION.md documenting monitoring process in `REACT-INTEGRATION.md`
+- [ ] T062 [P] [US6] Document feature selection criteria (P1/P2/P3) in REACT-INTEGRATION.md in `REACT-INTEGRATION.md`
+- [ ] T063 [P] [US6] Document evaluation questions for React features in REACT-INTEGRATION.md in `REACT-INTEGRATION.md`
+- [ ] T064 [P] [US6] Document direct porting strategy in REACT-INTEGRATION.md in `REACT-INTEGRATION.md`
+- [ ] T065 [P] [US6] Document adapted porting strategy in REACT-INTEGRATION.md in `REACT-INTEGRATION.md`
+- [ ] T066 [P] [US6] Document alternative implementation strategy in REACT-INTEGRATION.md in `REACT-INTEGRATION.md`
+- [ ] T067 [P] [US6] Document React-to-Vaadin component mapping table in REACT-INTEGRATION.md in `REACT-INTEGRATION.md`
+- [ ] T068 [P] [US6] Document pattern translation guide (React hooks → Vaadin patterns) in REACT-INTEGRATION.md in `REACT-INTEGRATION.md`
+- [ ] T069 [P] [US6] Create template for feature comparison document in REACT-INTEGRATION.md in `REACT-INTEGRATION.md`
+- [ ] T070 [P] [US6] Create template for porting decision log in REACT-INTEGRATION.md in `REACT-INTEGRATION.md`
+- [ ] T071 [US6] Create REACT-INTEGRATION-RU.md with Russian translation in `REACT-INTEGRATION-RU.md`
 - [ ] T072 [US6] Verify REACT-INTEGRATION.md and REACT-INTEGRATION-RU.md have identical structure
 
 **Checkpoint**: React integration process documented - team knows how to port features
@@ -200,17 +201,17 @@ Maven multi-module monorepo with packages structure:
 
 ### Implementation for User Story 4
 
-- [ ] T073 [P] [US4] Create `.env.example` template file with all required environment variables in `/home/runner/work/universo-platformo-java/universo-platformo-java/.env.example`
-- [ ] T074 [P] [US4] Document Supabase setup process in DATABASE-SETUP.md in `/home/runner/work/universo-platformo-java/universo-platformo-java/DATABASE-SETUP.md`
-- [ ] T075 [US4] Create DATABASE-SETUP-RU.md with Russian translation in `/home/runner/work/universo-platformo-java/universo-platformo-java/DATABASE-SETUP-RU.md`
-- [ ] T076 [P] [US4] Create SecurityConfig.java template in `/home/runner/work/universo-platformo-java/universo-platformo-java/packages/core-srv/base/src/main/java/pro/universo/core/api/config/SecurityConfig.java`
-- [ ] T077 [P] [US4] Create SupabaseJwtDecoder.java template in `/home/runner/work/universo-platformo-java/universo-platformo-java/packages/core-srv/base/src/main/java/pro/universo/core/api/security/SupabaseJwtDecoder.java`
-- [ ] T078 [P] [US4] Create JpaConfig.java template for database connection in `/home/runner/work/universo-platformo-java/universo-platformo-java/packages/core-srv/base/src/main/java/pro/universo/core/api/config/JpaConfig.java`
-- [ ] T079 [P] [US4] Document Row-Level Security (RLS) implementation pattern in DATABASE-SETUP.md in `/home/runner/work/universo-platformo-java/universo-platformo-java/DATABASE-SETUP.md`
-- [ ] T080 [P] [US4] Document authentication flow with Spring Security in AUTHENTICATION.md in `/home/runner/work/universo-platformo-java/universo-platformo-java/AUTHENTICATION.md`
-- [ ] T081 [US4] Create AUTHENTICATION-RU.md with Russian translation in `/home/runner/work/universo-platformo-java/universo-platformo-java/AUTHENTICATION-RU.md`
-- [ ] T082 [P] [US4] Create Flyway migration template V001__initial_schema.sql in `/home/runner/work/universo-platformo-java/universo-platformo-java/packages/core-srv/base/src/main/resources/db/migration/V001__initial_schema.sql`
-- [ ] T083 [P] [US4] Document database migration strategy with Flyway in DATABASE-SETUP.md in `/home/runner/work/universo-platformo-java/universo-platformo-java/DATABASE-SETUP.md`
+- [ ] T073 [P] [US4] Create `.env.example` template file with all required environment variables in `.env.example`
+- [ ] T074 [P] [US4] Document Supabase setup process in DATABASE-SETUP.md in `DATABASE-SETUP.md`
+- [ ] T075 [US4] Create DATABASE-SETUP-RU.md with Russian translation in `DATABASE-SETUP-RU.md`
+- [ ] T076 [P] [US4] Create SecurityConfig.java template in `packages/core-srv/base/src/main/java/pro/universo/core/api/config/SecurityConfig.java`
+- [ ] T077 [P] [US4] Create SupabaseJwtDecoder.java template in `packages/core-srv/base/src/main/java/pro/universo/core/api/security/SupabaseJwtDecoder.java`
+- [ ] T078 [P] [US4] Create JpaConfig.java template for database connection in `packages/core-srv/base/src/main/java/pro/universo/core/api/config/JpaConfig.java`
+- [ ] T079 [P] [US4] Document Row-Level Security (RLS) implementation pattern in DATABASE-SETUP.md in `DATABASE-SETUP.md`
+- [ ] T080 [P] [US4] Document authentication flow with Spring Security in AUTHENTICATION.md in `AUTHENTICATION.md`
+- [ ] T081 [US4] Create AUTHENTICATION-RU.md with Russian translation in `AUTHENTICATION-RU.md`
+- [ ] T082 [P] [US4] Create Flyway migration template V001__initial_schema.sql in `packages/core-srv/base/src/main/resources/db/migration/V001__initial_schema.sql`
+- [ ] T083 [P] [US4] Document database migration strategy with Flyway in DATABASE-SETUP.md in `DATABASE-SETUP.md`
 - [ ] T084 [US4] Verify no secrets or credentials committed to repository
 
 **Checkpoint**: Database and authentication foundation documented - developers can set up local environment
@@ -221,21 +222,23 @@ Maven multi-module monorepo with packages structure:
 
 **Purpose**: Finalize documentation, validate consistency, and prepare for first feature implementation
 
-- [ ] T085 [P] Update CONTRIBUTING.md with development workflow and coding standards in `/home/runner/work/universo-platformo-java/universo-platformo-java/CONTRIBUTING.md`
-- [ ] T086 [US4] Create CONTRIBUTING-RU.md with Russian translation in `/home/runner/work/universo-platformo-java/universo-platformo-java/CONTRIBUTING-RU.md`
-- [ ] T087 [P] Create CODE_OF_CONDUCT.md in `/home/runner/work/universo-platformo-java/universo-platformo-java/CODE_OF_CONDUCT.md`
-- [ ] T088 [US4] Create CODE_OF_CONDUCT-RU.md with Russian translation in `/home/runner/work/universo-platformo-java/universo-platformo-java/CODE_OF_CONDUCT-RU.md`
-- [ ] T089 [P] Update LICENSE file if needed in `/home/runner/work/universo-platformo-java/universo-platformo-java/LICENSE`
-- [ ] T090 [P] Create TESTING-STRATEGY.md documenting 70/25/5 test pyramid in `/home/runner/work/universo-platformo-java/universo-platformo-java/TESTING-STRATEGY.md`
-- [ ] T091 [US4] Create TESTING-STRATEGY-RU.md with Russian translation in `/home/runner/work/universo-platformo-java/universo-platformo-java/TESTING-STRATEGY-RU.md`
+- [ ] T085 [P] Update CONTRIBUTING.md with development workflow and coding standards in `CONTRIBUTING.md`
+- [ ] T086 [US4] Create CONTRIBUTING-RU.md with Russian translation in `CONTRIBUTING-RU.md`
+- [ ] T087 [P] Create CODE_OF_CONDUCT.md in `CODE_OF_CONDUCT.md`
+- [ ] T088 [US4] Create CODE_OF_CONDUCT-RU.md with Russian translation in `CODE_OF_CONDUCT-RU.md`
+- [ ] T089 [P] Update LICENSE file if needed in `LICENSE`
+- [ ] T090 [P] Create TESTING-STRATEGY.md documenting 70/25/5 test pyramid in `TESTING-STRATEGY.md`
+- [ ] T091 [US4] Create TESTING-STRATEGY-RU.md with Russian translation in `TESTING-STRATEGY-RU.md`
 - [ ] T092 Validate all bilingual documentation pairs have identical line counts and structure
 - [ ] T093 Run quickstart.md validation - verify all steps work correctly
-- [ ] T094 Create CHANGELOG.md with version 1.0.0-SNAPSHOT initial release notes in `/home/runner/work/universo-platformo-java/universo-platformo-java/CHANGELOG.md`
-- [ ] T095 [US4] Create CHANGELOG-RU.md with Russian translation in `/home/runner/work/universo-platformo-java/universo-platformo-java/CHANGELOG-RU.md`
+- [ ] T094 Create CHANGELOG.md with version 1.0.0-SNAPSHOT initial release notes in `CHANGELOG.md`
+- [ ] T095 [US4] Create CHANGELOG-RU.md with Russian translation in `CHANGELOG-RU.md`
 - [ ] T096 [P] Review all created files for typos and formatting consistency
 - [ ] T097 [P] Verify all file paths in documentation are correct and consistent
-- [ ] T098 Update root README.md with links to all new documentation files in `/home/runner/work/universo-platformo-java/universo-platformo-java/README.md`
-- [ ] T099 Update root README-RU.md with links to all new documentation files in `/home/runner/work/universo-platformo-java/universo-platformo-java/README-RU.md`
+- [ ] T097a Verify no `.github/agents/` directory exists (FR-008 compliance)
+- [ ] T097b Verify no `docs/` directory exists at repository root (FR-009 compliance)
+- [ ] T098 Update root README.md with links to all new documentation files in `README.md`
+- [ ] T099 Update root README-RU.md with links to all new documentation files in `README-RU.md`
 - [ ] T100 Final validation: Clone fresh repository and follow quickstart guide end-to-end
 
 ---
@@ -408,18 +411,18 @@ With multiple developers:
 
 ---
 
-## Total Task Count: 100 Tasks
+## Total Task Count: 103 Tasks
 
 ### Tasks by User Story:
 - **Setup (Phase 1)**: 4 tasks
 - **Foundational (Phase 2)**: 3 tasks
 - **US1 - Repository Foundation (P1)**: 12 tasks
-- **US2 - Issue Management (P2)**: 8 tasks
+- **US2 - Issue Management (P2)**: 9 tasks (includes PR template)
 - **US5 - Feature Patterns (P2)**: 12 tasks
 - **US3 - Project Structure (P3)**: 21 tasks
 - **US6 - React Integration (P3)**: 12 tasks
 - **US4 - Database/Auth (P4)**: 12 tasks
-- **Polish (Phase 9)**: 16 tasks
+- **Polish (Phase 9)**: 18 tasks (includes prohibition verifications)
 
 ### Parallel Opportunities:
 - **Setup**: 3 parallel tasks
@@ -444,19 +447,19 @@ This provides the foundational documentation that enables all subsequent develop
 ## Notes
 
 - **No runtime code**: This feature creates documentation and project structure only
-- **No tests needed**: Nothing to test yet (no business logic)
+- **No tests needed**: Nothing to test yet (no business logic) - **Constitution Principle IX compliance**: This is justified because feature 001 produces documentation and build configuration only, not runtime code. Future features implementing business logic MUST include 70%+ test coverage.
 - **[P] tasks**: Different files, can run in parallel
 - **[Story] labels**: Map tasks to user stories for traceability
 - **Bilingual requirement**: Every .md file must have -RU.md equivalent with identical structure
 - **Line count validation**: English and Russian versions must match line counts
-- **Exact file paths**: All tasks include absolute paths for clarity
+- **Relative file paths**: All tasks include relative paths from repository root for portability
 - **Constitution compliance**: All tasks follow NON-NEGOTIABLE principles (bilingual docs, monorepo structure, pattern consistency)
 - **React alignment**: US6 ensures Java implementation stays synchronized with React reference
 - **Incremental value**: Each user story checkpoint delivers standalone value
 
 ## Format Validation ✓
 
-All 100 tasks follow the required format:
+All 103 tasks follow the required format:
 - ✅ Checkbox: `- [ ]` at start of every task
 - ✅ Task ID: Sequential (T001-T100)
 - ✅ [P] marker: Only on parallelizable tasks
@@ -610,7 +613,7 @@ This tasks.md covers **Feature 001: Initial Project Setup** only. Based on the U
 
 When ready to implement a new feature:
 
-1. Create feature directory: `specs/[###-feature-name]/`
+1. Create feature directory: `.specify/specs/[###-feature-name]/`
 2. Generate specification files:
    - `spec.md` - User stories with priorities (P1, P2, P3)
    - `plan.md` - Technical implementation plan
