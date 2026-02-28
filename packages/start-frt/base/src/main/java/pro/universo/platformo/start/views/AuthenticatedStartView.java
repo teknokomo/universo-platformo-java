@@ -294,8 +294,8 @@ public class AuthenticatedStartView extends VerticalLayout {
         footer.add(
                 createFooterLink("📱 @diverslaboristo", "https://t.me/diverslaboristo", true),
                 createFooterLink("✉ contact@universo.pro", "mailto:contact@universo.pro", true),
-                createFooterLink("📋 Условия использования", "/terms", false),
-                createFooterLink("🔒 Политика конфиденциальности", "/privacy", false)
+                createFooterLink("📋 Условия использования", "#", false),
+                createFooterLink("🔒 Политика конфиденциальности", "#", false)
         );
 
         return footer;

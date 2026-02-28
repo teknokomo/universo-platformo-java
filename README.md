@@ -14,7 +14,7 @@ Universo Platformo Java is a comprehensive full-stack platform implementation us
 - **Authentication**: Supabase Auth REST API (called exclusively from backend services)
 - **Database**: Supabase (PostgreSQL-based) with abstracted data access
 - **Build Tool**: Maven (multi-module monorepo)
-- **Testing**: JUnit 5, Spring Test, Mockito
+- **Testing**: JUnit 5, Spring Test, Mockito, Vaadin TestBench
 - **UI Theme**: Vaadin Lumo theme with custom styling
 
 ## Project Structure

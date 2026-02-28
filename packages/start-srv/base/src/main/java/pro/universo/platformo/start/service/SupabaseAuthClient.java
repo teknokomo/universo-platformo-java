@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import pro.universo.platformo.start.config.SupabaseProperties;
 
@@ -93,6 +94,10 @@ public class SupabaseAuthClient {
             log.error("Supabase sign-in failed with status {}: {}", status, e.getResponseBodyAsString());
             // User-visible message; intentionally in Russian to match the application UI language
             throw new RuntimeException("Ошибка аутентификации: " + status);
+        } catch (RestClientException e) {
+            log.error("Supabase sign-in request failed: {}", e.getMessage());
+            // User-visible message; intentionally in Russian to match the application UI language
+            throw new RuntimeException("Сервис временно недоступен. Попробуйте позже.");
         }
     }
 
@@ -137,6 +142,10 @@ public class SupabaseAuthClient {
             log.error("Supabase sign-up failed with status {}: {}", status, e.getResponseBodyAsString());
             // User-visible message; intentionally in Russian to match the application UI language
             throw new RuntimeException("Ошибка регистрации: " + status);
+        } catch (RestClientException e) {
+            log.error("Supabase sign-up request failed: {}", e.getMessage());
+            // User-visible message; intentionally in Russian to match the application UI language
+            throw new RuntimeException("Сервис временно недоступен. Попробуйте позже.");
         }
     }
 
@@ -153,8 +162,9 @@ public class SupabaseAuthClient {
             return;
         }
         String baseUrl = properties.getUrl();
-        if (baseUrl == null || baseUrl.isBlank()) {
-            log.warn("Supabase URL is not configured; skipping server-side logout.");
+        String anonKey = properties.getAnonKey();
+        if (baseUrl == null || baseUrl.isBlank() || anonKey == null || anonKey.isBlank()) {
+            log.warn("Supabase is not configured; skipping server-side logout.");
             return;
         }
         try {
