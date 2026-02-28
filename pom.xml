@@ -35,6 +35,7 @@
     <modules>
         <module>packages/core-srv</module>
         <module>packages/core-frt</module>
+        <module>packages/start-frt</module>
     </modules>
 
     <dependencyManagement>
