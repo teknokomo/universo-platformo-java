@@ -26,7 +26,7 @@
         <vaadin.version>24.3.0</vaadin.version>
         
         <!-- Database -->
-        <postgresql.version>42.7.1</postgresql.version>
+        <postgresql.version>42.7.2</postgresql.version>
         
         <!-- Testing -->
         <junit.version>5.10.1</junit.version>
@@ -35,6 +35,8 @@
     <modules>
         <module>packages/core-srv</module>
         <module>packages/core-frt</module>
+        <module>packages/start-srv</module>
+        <module>packages/start-frt</module>
     </modules>
 
     <dependencyManagement>

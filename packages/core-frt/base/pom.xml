@@ -32,6 +32,13 @@
             <version>${project.version}</version>
         </dependency>
 
+        <!-- Start Frontend dependency -->
+        <dependency>
+            <groupId>pro.universo</groupId>
+            <artifactId>start-frt-base</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
         <!-- Spring Boot Starter Test -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

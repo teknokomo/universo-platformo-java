@@ -4,11 +4,14 @@ import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.auth.AnonymousAllowed;
 
 /**
- * Main landing view for Universo Platformo.
+ * Legacy main view - superseded by StartView from start-frt-base.
+ * Retained as a fallback under the /core route.
  */
-@Route("")
+@Route("core")
+@AnonymousAllowed
 public class MainView extends VerticalLayout {
 
     public MainView() {
