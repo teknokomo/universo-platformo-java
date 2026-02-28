@@ -3,7 +3,11 @@ package pro.universo.platformo.start.service;
 import java.io.Serializable;
 
 /**
- * Represents an authenticated Supabase user stored in the Vaadin session.
+ * Represents an authenticated Supabase user.
+ *
+ * Serializable so it can be stored in an HTTP session or Vaadin session.
+ * The {@code accessToken} is the short-lived JWT issued by Supabase;
+ * it is used by the backend to call protected Supabase APIs (e.g. logout).
  */
 public class SupabaseUser implements Serializable {
 

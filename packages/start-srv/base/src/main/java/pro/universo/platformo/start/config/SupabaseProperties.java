@@ -1,13 +1,21 @@
 package pro.universo.platformo.start.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
 
 /**
  * Supabase configuration properties.
- * Set via environment variables: SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_JWT_SECRET
+ *
+ * Bound via Spring Boot's type-safe configuration binding.
+ * Register with {@code @EnableConfigurationProperties(SupabaseProperties.class)}
+ * or via {@code @ConfigurationPropertiesScan}.
+ *
+ * Set values through environment variables:
+ * <ul>
+ *   <li>{@code SUPABASE_URL}        – e.g. https://abcdefgh.supabase.co</li>
+ *   <li>{@code SUPABASE_ANON_KEY}   – public anonymous key from the Supabase dashboard</li>
+ *   <li>{@code SUPABASE_JWT_SECRET} – JWT secret from the Supabase dashboard</li>
+ * </ul>
  */
-@Component
 @ConfigurationProperties(prefix = "supabase")
 public class SupabaseProperties {
 

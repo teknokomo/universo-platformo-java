@@ -1,71 +1,55 @@
 package pro.universo.platformo.start;
 
 import org.junit.jupiter.api.Test;
-import pro.universo.platformo.start.config.SupabaseProperties;
+import pro.universo.platformo.start.service.SupabaseAuthClient;
 import pro.universo.platformo.start.service.SupabaseAuthService;
 import pro.universo.platformo.start.service.SupabaseUser;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.Mockito.mock;
 
 /**
- * Unit tests for the start-frt-base module components.
- * Integration / context-load tests require a running Vaadin + Spring Boot environment
- * and are covered by the core-frt-base module's CoreFrontendApplicationTests.
+ * Unit tests for the start-frt-base module.
+ *
+ * Tests for SupabaseProperties, SupabaseUser and SupabaseAuthClient live in
+ * the start-srv-base module (StartSrvBaseTests). These tests focus exclusively
+ * on the session-management layer in start-frt-base.
+ *
+ * Integration / context-load tests require a running Vaadin + Spring Boot
+ * environment and are covered by CoreFrontendApplicationTests in core-frt-base.
  */
 class StartFrtBaseTests {
 
     @Test
-    void supabasePropertiesDefaultValues() {
-        SupabaseProperties props = new SupabaseProperties();
-        assertEquals("", props.getUrl());
-        assertEquals("", props.getAnonKey());
-        assertEquals("", props.getJwtSecret());
-    }
-
-    @Test
-    void supabasePropertiesSetValues() {
-        SupabaseProperties props = new SupabaseProperties();
-        props.setUrl("https://example.supabase.co");
-        props.setAnonKey("anon-key-value");
-        props.setJwtSecret("jwt-secret-value");
-
-        assertEquals("https://example.supabase.co", props.getUrl());
-        assertEquals("anon-key-value", props.getAnonKey());
-        assertEquals("jwt-secret-value", props.getJwtSecret());
-    }
-
-    @Test
-    void supabaseUserStoresFields() {
-        SupabaseUser user = new SupabaseUser("user-id-123", "user@example.com", "access-token-abc");
-
-        assertEquals("user-id-123", user.getId());
-        assertEquals("user@example.com", user.getEmail());
-        assertEquals("access-token-abc", user.getAccessToken());
-    }
-
-    @Test
     void supabaseAuthServiceNullSessionIsNotAuthenticated() {
-        // Without a VaadinSession (outside Vaadin context), getCurrentUser() returns null
-        SupabaseProperties props = new SupabaseProperties();
-        SupabaseAuthService service = new SupabaseAuthService(props);
+        // Without a VaadinSession (outside Vaadin context) getCurrentUser() returns null
+        SupabaseAuthClient mockClient = mock(SupabaseAuthClient.class);
+        SupabaseAuthService service = new SupabaseAuthService(mockClient);
 
-        // VaadinSession.getCurrent() returns null outside of a Vaadin request context
+        // VaadinSession.getCurrent() returns null outside a Vaadin request context
         assertNull(service.getCurrentUser());
         assertFalse(service.isAuthenticated());
     }
 
     @Test
-    void supabaseAuthServiceValidateConfigThrowsWhenUrlBlank() {
-        SupabaseProperties props = new SupabaseProperties();
-        SupabaseAuthService service = new SupabaseAuthService(props);
+    void supabaseAuthServiceSetCurrentUserNoOpWhenNoSession() {
+        // setCurrentUser outside a Vaadin session should not throw
+        SupabaseAuthClient mockClient = mock(SupabaseAuthClient.class);
+        SupabaseAuthService service = new SupabaseAuthService(mockClient);
 
-        RuntimeException ex = org.junit.jupiter.api.Assertions.assertThrows(
-                RuntimeException.class,
-                () -> service.signIn("test@example.com", "password")
-        );
-        assert ex.getMessage().contains("SUPABASE_URL");
+        SupabaseUser user = new SupabaseUser("id", "email@example.com", "token");
+        service.setCurrentUser(user); // must not throw
+        assertNull(service.getCurrentUser()); // still null – no session
+    }
+
+    @Test
+    void supabaseAuthServiceClearCurrentUserNoOpWhenNoSession() {
+        SupabaseAuthClient mockClient = mock(SupabaseAuthClient.class);
+        SupabaseAuthService service = new SupabaseAuthService(mockClient);
+
+        service.clearCurrentUser(); // must not throw outside Vaadin session
     }
 
 }
+

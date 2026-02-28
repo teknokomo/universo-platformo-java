@@ -9,12 +9,13 @@ Universo Platformo Java is a comprehensive full-stack platform implementation us
 ## Technology Stack
 
 - **Language**: Java 17+ (LTS)
-- **Frontend Framework**: Vaadin 24.x (Flow)
+- **Frontend Framework**: Vaadin 24.x (Flow) — server-side UI components rendered in the browser
 - **Backend Framework**: Spring Boot 3.x with Spring Framework 6.x
+- **Authentication**: Supabase Auth REST API (called exclusively from backend services)
 - **Database**: Supabase (PostgreSQL-based) with abstracted data access
 - **Build Tool**: Maven (multi-module monorepo)
-- **Testing**: JUnit 5, Spring Test, Vaadin TestBench
-- **UI Theme**: Vaadin Lumo theme with Material Design-inspired customizations
+- **Testing**: JUnit 5, Spring Test, Mockito
+- **UI Theme**: Vaadin Lumo theme with custom styling
 
 ## Project Structure
 
@@ -32,12 +33,15 @@ This project uses a monorepo architecture with packages organized under `package
 universo-platformo-java/
 ├── packages/
 │   ├── core-srv/          # Core backend services
-│   │   └── base/          # Base implementation
-│   └── core-frt/          # Core frontend UI
-│       └── base/          # Base implementation
-├── specs/                 # Feature specifications
+│   │   └── base/          # Base implementation (Spring Boot, JPA, Security)
+│   ├── core-frt/          # Core frontend UI — Spring Boot application entry point
+│   │   └── base/          # Vaadin application shell, depends on start-* packages
+│   ├── start-srv/         # Start page backend services
+│   │   └── base/          # Supabase auth HTTP client, DTOs, configuration
+│   └── start-frt/         # Start page frontend views
+│       └── base/          # Guest page, authenticated onboarding, login view
 ├── .specify/              # Specification tooling and templates
-└── pom.xml               # Root Maven configuration
+└── pom.xml                # Root Maven configuration
 ```
 
 ### Package Naming Convention
@@ -46,13 +50,35 @@ universo-platformo-java/
 - `-frt` suffix: Frontend/UI packages (REQUIRED for all frontend functionality)
 - `base/` directory: Base implementation (REQUIRED in each package, supports future multiple implementations)
 
+### Architecture: Frontend — Backend — Supabase
+
+The frontend never calls Supabase directly. All Supabase API calls go through the backend:
+
+```
+Browser ─── (Vaadin WebSocket/HTTP) ──► Vaadin Views (start-frt)
+                                              │
+                                              ▼
+                                     SupabaseAuthService (start-frt)
+                                     [session management only]
+                                              │
+                                              ▼
+                                     SupabaseAuthClient (start-srv)
+                                     [HTTP client with timeouts]
+                                              │
+                                              ▼
+                                       Supabase REST API
+```
+
+`SupabaseAuthClient` (`start-srv`) is the single component allowed to call Supabase.
+`SupabaseAuthService` (`start-frt`) manages the Vaadin session; it never calls Supabase directly.
+
 ## Getting Started
 
 ### Prerequisites
 
 - Java 17 or later (LTS version recommended)
 - Maven 3.9.x or later
-- PostgreSQL database (or Supabase account)
+- A Supabase project (for authentication) or PostgreSQL database
 
 ### Installation
 
@@ -71,11 +97,6 @@ mvn clean install
 
 4. Run the application:
 ```bash
-# Run backend services
-cd packages/core-srv/base
-mvn spring-boot:run
-
-# Run frontend application (in another terminal)
 cd packages/core-frt/base
 mvn spring-boot:run
 ```
@@ -84,9 +105,21 @@ The application will be available at `http://localhost:8080`
 
 ## Configuration
 
+### Supabase Authentication
+
+Set the following environment variables to enable Supabase authentication:
+
+```bash
+export SUPABASE_URL=https://your-project-id.supabase.co
+export SUPABASE_ANON_KEY=your-anon-public-key
+export SUPABASE_JWT_SECRET=your-jwt-secret
+```
+
+Find these values in your Supabase project under **Settings → API**.
+
 ### Database Configuration
 
-Set the following environment variables for database connection:
+Set the following environment variables for PostgreSQL database connection:
 
 ```bash
 export DATABASE_URL=jdbc:postgresql://your-supabase-host:5432/your-database
@@ -94,15 +127,21 @@ export DATABASE_USERNAME=your-username
 export DATABASE_PASSWORD=your-password
 ```
 
-### Authentication Configuration
-
-Set JWT secret for Supabase authentication:
+### JWT Configuration
 
 ```bash
 export JWT_SECRET=your-supabase-jwt-secret
 ```
 
 **Important**: Never commit credentials to the repository. Always use environment variables or external configuration files.
+
+## Start Pages
+
+The `start-frt/base` module provides two start pages driven by authentication state:
+
+- **Guest page** (`/`): Landing page with hero section, testimonials and footer. Includes a "Sign In" button and a "To the future" call-to-action that navigate to `/login`.
+- **Authenticated page** (`/`): Three-step onboarding wizard (Welcome → Select interests → Complete) shown after login. Displays the user's email and a logout button.
+- **Login page** (`/login`): Tabbed form for email/password sign-in and registration via Supabase.
 
 ## Development Guidelines
 
@@ -139,9 +178,9 @@ Run all tests:
 mvn test
 ```
 
-Run tests for specific package:
+Run tests for a specific package:
 ```bash
-cd packages/core-srv/base
+cd packages/start-srv/base
 mvn test
 ```
 
@@ -159,15 +198,15 @@ This will create optimized builds with Vaadin production mode enabled.
 This implementation is based on concepts from [Universo Platformo React](https://github.com/teknokomo/universo-platformo-react). While following the same conceptual architecture, this project adapts patterns to Java ecosystem conventions and best practices.
 
 **Key Reference Documents**:
-- **Best Practices Validation**: [`.specify/memory/best-practices-validation-2025-11-18.md`](.specify/memory/best-practices-validation-2025-11-18.md) - Comprehensive validation of architecture against industry best practices (Score: 95/100)
-- **Spring Modulith Guide**: [`.specify/memory/spring-modulith-verification-guide.md`](.specify/memory/spring-modulith-verification-guide.md) - Guide for automated architecture verification
-- **Java/Vaadin/Spring Best Practices**: [`.specify/memory/java-vaadin-spring-best-practices.md`](.specify/memory/java-vaadin-spring-best-practices.md) - Comprehensive best practices for the technology stack
-- **Pattern Translation Guide**: [`.specify/memory/react-to-java-patterns.md`](.specify/memory/react-to-java-patterns.md) - Comprehensive mapping of React/Express patterns to Vaadin/Spring equivalents with code examples
-- **Architecture Analysis**: [`.specify/memory/react-architecture-analysis.md`](.specify/memory/react-architecture-analysis.md) - Deep analysis of React repository structure, patterns, and 32+ implemented features
-- **Feature Roadmap**: [`.specify/memory/feature-implementation-roadmap.md`](.specify/memory/feature-implementation-roadmap.md) - Priority-ordered roadmap for implementing features from React reference
-- **Gap Analysis**: [`.specify/memory/gap-analysis.md`](.specify/memory/gap-analysis.md) - Detailed comparison of React vs Java implementation status
+- **Best Practices Validation**: [`.specify/memory/best-practices-validation-2025-11-18.md`](.specify/memory/best-practices-validation-2025-11-18.md)
+- **Spring Modulith Guide**: [`.specify/memory/spring-modulith-verification-guide.md`](.specify/memory/spring-modulith-verification-guide.md)
+- **Java/Vaadin/Spring Best Practices**: [`.specify/memory/java-vaadin-spring-best-practices.md`](.specify/memory/java-vaadin-spring-best-practices.md)
+- **Pattern Translation Guide**: [`.specify/memory/react-to-java-patterns.md`](.specify/memory/react-to-java-patterns.md)
+- **Architecture Analysis**: [`.specify/memory/react-architecture-analysis.md`](.specify/memory/react-architecture-analysis.md)
+- **Feature Roadmap**: [`.specify/memory/feature-implementation-roadmap.md`](.specify/memory/feature-implementation-roadmap.md)
+- **Gap Analysis**: [`.specify/memory/gap-analysis.md`](.specify/memory/gap-analysis.md)
 
-**Note**: The React implementation is partially complete and contains legacy code that is being refactored. This Java implementation should focus on clean, enterprise-grade patterns.
+**Note**: The React implementation is partially complete and contains legacy code that is being refactored. This Java implementation focuses on clean, enterprise-grade patterns.
 
 ## Contributing
 

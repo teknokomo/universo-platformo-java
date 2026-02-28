@@ -1,142 +1,72 @@
 package pro.universo.platformo.start.service;
 
 import com.vaadin.flow.server.VaadinSession;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
-import pro.universo.platformo.start.config.SupabaseProperties;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
- * Service for Supabase authentication.
+ * Frontend session service for Supabase authentication.
  *
- * Calls the Supabase REST Auth API and stores the authenticated user
- * in the current Vaadin session.
+ * <p>This service lives in the {@code start-frt} (frontend) module and is
+ * responsible <em>only</em> for Vaadin session state management (who is
+ * currently logged in). It does <strong>not</strong> communicate with
+ * Supabase directly.
+ *
+ * <p>All HTTP calls to the Supabase REST API are delegated to
+ * {@link SupabaseAuthClient}, which lives in the {@code start-srv} (backend)
+ * module. This separation ensures that the frontend never touches an external
+ * service directly.
+ *
+ * <p>Data flow:
+ * <pre>
+ *   Vaadin View → SupabaseAuthService (start-frt, session layer)
+ *                      └── SupabaseAuthClient (start-srv, HTTP client)
+ *                               └── Supabase REST API
+ * </pre>
  */
 @Service
 public class SupabaseAuthService {
 
     static final String SESSION_KEY = "supabaseUser";
 
-    private final SupabaseProperties properties;
-    private final RestTemplate restTemplate;
+    private final SupabaseAuthClient authClient;
 
-    public SupabaseAuthService(SupabaseProperties properties) {
-        this.properties = properties;
-        this.restTemplate = new RestTemplate();
+    public SupabaseAuthService(SupabaseAuthClient authClient) {
+        this.authClient = authClient;
     }
 
     /**
-     * Sign in with email and password via Supabase.
+     * Signs in via the backend client and stores the user in the Vaadin session.
      *
-     * @throws RuntimeException if credentials are invalid or Supabase is unreachable
+     * @throws RuntimeException on invalid credentials or backend errors
      */
     public SupabaseUser signIn(String email, String password) {
-        validateConfig();
-
-        String url = properties.getUrl() + "/auth/v1/token?grant_type=password";
-        HttpHeaders headers = buildHeaders();
-
-        Map<String, String> body = new HashMap<>();
-        body.put("email", email);
-        body.put("password", password);
-
-        HttpEntity<Map<String, String>> request = new HttpEntity<>(body, headers);
-
-        try {
-            ResponseEntity<SupabaseAuthResponse> response = restTemplate.exchange(
-                    url, HttpMethod.POST, request, SupabaseAuthResponse.class);
-
-            SupabaseAuthResponse authResponse = response.getBody();
-            if (authResponse == null || authResponse.getUser() == null) {
-                throw new RuntimeException("Пустой ответ от Supabase");
-            }
-
-            return new SupabaseUser(
-                    authResponse.getUser().getId(),
-                    authResponse.getUser().getEmail(),
-                    authResponse.getAccessToken());
-
-        } catch (HttpClientErrorException e) {
-            if (e.getStatusCode().value() == 400 || e.getStatusCode().value() == 422) {
-                throw new RuntimeException("Неверный email или пароль");
-            }
-            throw new RuntimeException("Ошибка аутентификации: " + e.getStatusCode());
-        }
+        return authClient.signIn(email, password);
     }
 
     /**
-     * Register a new user via Supabase.
+     * Registers a new user via the backend client.
      *
-     * @throws RuntimeException if registration fails
+     * @return the new user, or {@code null} when email confirmation is required
+     * @throws RuntimeException on registration failure
      */
     public SupabaseUser signUp(String email, String password) {
-        validateConfig();
-
-        String url = properties.getUrl() + "/auth/v1/signup";
-        HttpHeaders headers = buildHeaders();
-
-        Map<String, String> body = new HashMap<>();
-        body.put("email", email);
-        body.put("password", password);
-
-        HttpEntity<Map<String, String>> request = new HttpEntity<>(body, headers);
-
-        try {
-            ResponseEntity<SupabaseAuthResponse> response = restTemplate.exchange(
-                    url, HttpMethod.POST, request, SupabaseAuthResponse.class);
-
-            SupabaseAuthResponse authResponse = response.getBody();
-            if (authResponse == null) {
-                throw new RuntimeException("Пустой ответ от Supabase");
-            }
-
-            if (authResponse.getUser() == null) {
-                // Email confirmation required
-                return null;
-            }
-
-            return new SupabaseUser(
-                    authResponse.getUser().getId(),
-                    authResponse.getUser().getEmail(),
-                    authResponse.getAccessToken());
-
-        } catch (HttpClientErrorException e) {
-            if (e.getStatusCode().value() == 422) {
-                throw new RuntimeException("Пользователь с таким email уже существует");
-            }
-            throw new RuntimeException("Ошибка регистрации: " + e.getStatusCode());
-        }
+        return authClient.signUp(email, password);
     }
 
     /**
-     * Sign out the current user from Supabase and clear the session.
+     * Signs out the current user: revokes the Supabase token via the backend
+     * client and clears the local Vaadin session.
      */
     public void signOut() {
         SupabaseUser user = getCurrentUser();
-        if (user != null && user.getAccessToken() != null) {
-            try {
-                String url = properties.getUrl() + "/auth/v1/logout";
-                HttpHeaders headers = buildHeaders();
-                headers.set("Authorization", "Bearer " + user.getAccessToken());
-                HttpEntity<Void> request = new HttpEntity<>(headers);
-                restTemplate.exchange(url, HttpMethod.POST, request, Void.class);
-            } catch (Exception ignored) {
-                // Logout errors are non-critical
-            }
+        if (user != null) {
+            authClient.signOut(user.getAccessToken());
         }
         clearCurrentUser();
     }
 
     /**
-     * Returns the authenticated user from the current Vaadin session, or null.
+     * Returns the authenticated user from the current Vaadin session, or {@code null}.
      */
     public SupabaseUser getCurrentUser() {
         VaadinSession session = VaadinSession.getCurrent();
@@ -167,24 +97,11 @@ public class SupabaseAuthService {
     }
 
     /**
-     * Returns true if a user is stored in the current Vaadin session.
+     * Returns {@code true} if a user is stored in the current Vaadin session.
      */
     public boolean isAuthenticated() {
         return getCurrentUser() != null;
     }
 
-    private HttpHeaders buildHeaders() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("apikey", properties.getAnonKey());
-        return headers;
-    }
-
-    private void validateConfig() {
-        if (properties.getUrl() == null || properties.getUrl().isBlank()) {
-            throw new RuntimeException(
-                    "Supabase не настроен. Задайте SUPABASE_URL и SUPABASE_ANON_KEY в переменных среды.");
-        }
-    }
-
 }
+

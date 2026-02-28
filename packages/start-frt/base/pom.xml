@@ -31,10 +31,11 @@
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
 
-        <!-- Spring Boot Starter Web (for RestTemplate to call Supabase API) -->
+        <!-- Start Backend: Supabase auth client, DTOs and configuration -->
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
+            <groupId>pro.universo</groupId>
+            <artifactId>start-srv-base</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
         <!-- Spring Boot Starter Test -->

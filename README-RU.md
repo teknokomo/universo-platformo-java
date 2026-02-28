@@ -9,18 +9,19 @@ Universo Platformo Java — это комплексная реализация �
 ## Технологический стек
 
 - **Язык**: Java 17+ (LTS)
-- **Фреймворк фронтенда**: Vaadin 24.x (Flow)
+- **Фреймворк фронтенда**: Vaadin 24.x (Flow) — серверные UI-компоненты, отображаемые в браузере
 - **Фреймворк бэкенда**: Spring Boot 3.x с Spring Framework 6.x
+- **Аутентификация**: Supabase Auth REST API (вызывается исключительно из серверных сервисов)
 - **База данных**: Supabase (на базе PostgreSQL) с абстрагированным доступом к данным
 - **Инструмент сборки**: Maven (мультимодульный монорепозиторий)
-- **Тестирование**: JUnit 5, Spring Test, Vaadin TestBench
-- **UI тема**: Тема Vaadin Lumo с кастомизациями в стиле Material Design
+- **Тестирование**: JUnit 5, Spring Test, Mockito
+- **UI тема**: Тема Vaadin Lumo с пользовательскими стилями
 
 ## Структура проекта
 
 **⚠️ ОБЯЗАТЕЛЬНОЕ ТРЕБОВАНИЕ К АРХИТЕКТУРЕ ⚠️**
 
-ВЕСЬ функционал в этом проекте ДОЛЖЕН быть реализован как модульные пакеты в директории `packages/`. Создание функционала вне этой структуры нарушает конституцию проекта (Принцип I - БЕЗУСЛОВНЫЙ) и будет отклонено при code review.
+ВЕСЬ функционал в этом проекте ДОЛЖЕН быть реализован как модульные пакеты в директории `packages/`. Создание функционала вне этой структуры нарушает конституцию проекта (Принцип I — БЕЗУСЛОВНЫЙ) и будет отклонено при code review.
 
 Эта модульная архитектура основана на проверенном паттерне из [Universo Platformo React](https://github.com/teknokomo/universo-platformo-react), который успешно реализует 32+ модульных пакета. Модульная структура ОБЯЗАТЕЛЬНА, потому что отдельные пакеты в будущем будут извлечены в отдельные репозитории по мере развития платформы.
 
@@ -32,19 +33,44 @@ Universo Platformo Java — это комплексная реализация �
 universo-platformo-java/
 ├── packages/
 │   ├── core-srv/          # Базовые серверные сервисы
-│   │   └── base/          # Базовая реализация
-│   └── core-frt/          # Базовый пользовательский интерфейс
-│       └── base/          # Базовая реализация
-├── specs/                 # Спецификации функционала
+│   │   └── base/          # Базовая реализация (Spring Boot, JPA, Security)
+│   ├── core-frt/          # Базовый UI — точка входа приложения Spring Boot
+│   │   └── base/          # Оболочка приложения Vaadin, зависит от start-* пакетов
+│   ├── start-srv/         # Серверные сервисы стартовой страницы
+│   │   └── base/          # HTTP-клиент Supabase Auth, DTO, конфигурация
+│   └── start-frt/         # Представления фронтенда стартовой страницы
+│       └── base/          # Страница гостя, онбординг, страница входа
 ├── .specify/              # Инструменты и шаблоны для спецификаций
-└── pom.xml               # Корневая конфигурация Maven
+└── pom.xml                # Корневая конфигурация Maven
 ```
 
 ### Соглашение об именовании пакетов
 
 - Суффикс `-srv`: Пакеты бэкенда/сервера (ОБЯЗАТЕЛЬНО для всего функционала бэкенда)
 - Суффикс `-frt`: Пакеты фронтенда/UI (ОБЯЗАТЕЛЬНО для всего функционала фронтенда)
-- Директория `base/`: Базовая реализация (ОБЯЗАТЕЛЬНА в каждом пакете, поддерживает будущие множественные реализации)
+- Директория `base/`: Базовая реализация (ОБЯЗАТЕЛЬНА в каждом пакете, поддерживает будущие реализации)
+
+### Архитектура: Фронтенд — Бэкенд — Supabase
+
+Фронтенд никогда не обращается к Supabase напрямую. Все вызовы Supabase API проходят через бэкенд:
+
+```
+Браузер ── (Vaadin WebSocket/HTTP) ──► Представления Vaadin (start-frt)
+                                              │
+                                              ▼
+                                     SupabaseAuthService (start-frt)
+                                     [управление сессией]
+                                              │
+                                              ▼
+                                     SupabaseAuthClient (start-srv)
+                                     [HTTP-клиент с таймаутами]
+                                              │
+                                              ▼
+                                       Supabase REST API
+```
+
+`SupabaseAuthClient` (`start-srv`) — единственный компонент, которому разрешено обращаться к Supabase.
+`SupabaseAuthService` (`start-frt`) управляет сессией Vaadin; к Supabase напрямую не обращается.
 
 ## Начало работы
 
@@ -52,7 +78,7 @@ universo-platformo-java/
 
 - Java 17 или новее (рекомендуется LTS версия)
 - Maven 3.9.x или новее
-- База данных PostgreSQL (или аккаунт Supabase)
+- Проект Supabase (для аутентификации) или база данных PostgreSQL
 
 ### Установка
 
@@ -71,11 +97,6 @@ mvn clean install
 
 4. Запустите приложение:
 ```bash
-# Запуск серверных сервисов
-cd packages/core-srv/base
-mvn spring-boot:run
-
-# Запуск приложения фронтенда (в другом терминале)
 cd packages/core-frt/base
 mvn spring-boot:run
 ```
@@ -84,9 +105,21 @@ mvn spring-boot:run
 
 ## Конфигурация
 
+### Аутентификация Supabase
+
+Установите следующие переменные окружения для включения аутентификации через Supabase:
+
+```bash
+export SUPABASE_URL=https://your-project-id.supabase.co
+export SUPABASE_ANON_KEY=your-anon-public-key
+export SUPABASE_JWT_SECRET=your-jwt-secret
+```
+
+Эти значения находятся в вашем проекте Supabase в разделе **Settings → API**.
+
 ### Конфигурация базы данных
 
-Установите следующие переменные окружения для подключения к базе данных:
+Установите следующие переменные окружения для подключения к базе данных PostgreSQL:
 
 ```bash
 export DATABASE_URL=jdbc:postgresql://your-supabase-host:5432/your-database
@@ -94,15 +127,21 @@ export DATABASE_USERNAME=your-username
 export DATABASE_PASSWORD=your-password
 ```
 
-### Конфигурация аутентификации
-
-Установите JWT-секрет для аутентификации Supabase:
+### Конфигурация JWT
 
 ```bash
 export JWT_SECRET=your-supabase-jwt-secret
 ```
 
 **Важно**: Никогда не коммитьте учётные данные в репозиторий. Всегда используйте переменные окружения или внешние файлы конфигурации.
+
+## Стартовые страницы
+
+Модуль `start-frt/base` предоставляет две стартовые страницы в зависимости от состояния аутентификации:
+
+- **Страница гостя** (`/`): Лендинг с секцией-герой, отзывами и футером. Содержит кнопки «Войти» и «В будущее», ведущие на `/login`.
+- **Страница авторизованного** (`/`): Трёхшаговый мастер онбординга (Приветствие → Выбор интересов → Завершение) после входа. Отображает email пользователя и кнопку выхода.
+- **Страница входа** (`/login`): Форма с вкладками для входа и регистрации через Supabase по email и паролю.
 
 ## Рекомендации по разработке
 
@@ -141,7 +180,7 @@ mvn test
 
 Запуск тестов для конкретного пакета:
 ```bash
-cd packages/core-srv/base
+cd packages/start-srv/base
 mvn test
 ```
 
@@ -159,15 +198,15 @@ mvn clean package -Pproduction
 Данная реализация основана на концепциях из [Universo Platformo React](https://github.com/teknokomo/universo-platformo-react). Следуя той же концептуальной архитектуре, данный проект адаптирует паттерны к соглашениям и лучшим практикам экосистемы Java.
 
 **Ключевые справочные документы**:
-- **Валидация лучших практик**: [`.specify/memory/best-practices-validation-2025-11-18.md`](.specify/memory/best-practices-validation-2025-11-18.md) - Комплексная валидация архитектуры на соответствие лучшим отраслевым практикам (Оценка: 95/100)
-- **Руководство по Spring Modulith**: [`.specify/memory/spring-modulith-verification-guide.md`](.specify/memory/spring-modulith-verification-guide.md) - Руководство по автоматизированной верификации архитектуры
-- **Лучшие практики Java/Vaadin/Spring**: [`.specify/memory/java-vaadin-spring-best-practices.md`](.specify/memory/java-vaadin-spring-best-practices.md) - Комплексные лучшие практики для технологического стека
-- **Руководство по переводу паттернов**: [`.specify/memory/react-to-java-patterns.md`](.specify/memory/react-to-java-patterns.md) - Полное соответствие паттернов React/Express эквивалентам Vaadin/Spring с примерами кода
-- **Анализ архитектуры**: [`.specify/memory/react-architecture-analysis.md`](.specify/memory/react-architecture-analysis.md) - Глубокий анализ структуры репозитория React, паттернов и 32+ реализованных функций
-- **Дорожная карта функций**: [`.specify/memory/feature-implementation-roadmap.md`](.specify/memory/feature-implementation-roadmap.md) - Упорядоченная по приоритетам дорожная карта реализации функций из референсной реализации React
-- **Анализ пробелов**: [`.specify/memory/gap-analysis.md`](.specify/memory/gap-analysis.md) - Детальное сравнение статуса реализаций React и Java
+- **Валидация лучших практик**: [`.specify/memory/best-practices-validation-2025-11-18.md`](.specify/memory/best-practices-validation-2025-11-18.md)
+- **Руководство по Spring Modulith**: [`.specify/memory/spring-modulith-verification-guide.md`](.specify/memory/spring-modulith-verification-guide.md)
+- **Лучшие практики Java/Vaadin/Spring**: [`.specify/memory/java-vaadin-spring-best-practices.md`](.specify/memory/java-vaadin-spring-best-practices.md)
+- **Руководство по переводу паттернов**: [`.specify/memory/react-to-java-patterns.md`](.specify/memory/react-to-java-patterns.md)
+- **Анализ архитектуры**: [`.specify/memory/react-architecture-analysis.md`](.specify/memory/react-architecture-analysis.md)
+- **Дорожная карта функций**: [`.specify/memory/feature-implementation-roadmap.md`](.specify/memory/feature-implementation-roadmap.md)
+- **Анализ пробелов**: [`.specify/memory/gap-analysis.md`](.specify/memory/gap-analysis.md)
 
-**Примечание**: Реализация на React частично завершена и содержит легаси-код, который рефакторится. Данная реализация на Java должна сосредоточиться на чистых, корпоративных паттернах.
+**Примечание**: Реализация на React частично завершена и содержит легаси-код, который рефакторится. Данная реализация на Java сосредоточена на чистых, корпоративных паттернах.
 
 ## Участие в разработке
 

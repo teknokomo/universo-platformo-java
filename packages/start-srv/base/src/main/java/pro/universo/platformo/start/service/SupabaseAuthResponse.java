@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * Response from Supabase auth endpoints (sign-in / sign-up).
+ * Unknown fields are ignored to tolerate future Supabase API additions.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SupabaseAuthResponse {
@@ -33,7 +34,7 @@ public class SupabaseAuthResponse {
     }
 
     /**
-     * Nested user data from Supabase auth response.
+     * Nested user data from the Supabase auth response.
      */
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class UserData {
