@@ -35,7 +35,10 @@ public class SupabaseAuthService {
     }
 
     /**
-     * Signs in via the backend client and stores the user in the Vaadin session.
+     * Signs in via the backend client.
+     *
+     * <p>The caller is responsible for storing the returned user in the session
+     * via {@link #setCurrentUser(SupabaseUser)}.
      *
      * @throws RuntimeException on invalid credentials or backend errors
      */

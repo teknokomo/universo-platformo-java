@@ -7,6 +7,7 @@ import pro.universo.platformo.start.service.SupabaseUser;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit tests for the start-srv-base module.
@@ -55,7 +56,7 @@ class StartSrvBaseTests {
                 () -> client.signIn("test@example.com", "password")
         );
         // The operator-facing error message must mention the environment variable name
-        assert ex.getMessage().contains("SUPABASE_URL");
+        assertTrue(ex.getMessage().contains("SUPABASE_URL"));
     }
 
     @Test
@@ -67,6 +68,19 @@ class StartSrvBaseTests {
                 IllegalStateException.class,
                 () -> client.signUp("test@example.com", "password")
         );
+    }
+
+    @Test
+    void supabaseAuthClientSignInThrowsIllegalStateWhenAnonKeyBlank() {
+        SupabaseProperties props = new SupabaseProperties();
+        props.setUrl("https://example.supabase.co"); // URL set, but anonKey is still ""
+        SupabaseAuthClient client = new SupabaseAuthClient(props);
+
+        IllegalStateException ex = assertThrows(
+                IllegalStateException.class,
+                () -> client.signIn("test@example.com", "password")
+        );
+        assertTrue(ex.getMessage().contains("SUPABASE_ANON_KEY"));
     }
 
     @Test

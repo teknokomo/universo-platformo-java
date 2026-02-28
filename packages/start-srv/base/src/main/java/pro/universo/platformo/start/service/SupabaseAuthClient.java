@@ -152,8 +152,13 @@ public class SupabaseAuthClient {
         if (accessToken == null || accessToken.isBlank()) {
             return;
         }
+        String baseUrl = properties.getUrl();
+        if (baseUrl == null || baseUrl.isBlank()) {
+            log.warn("Supabase URL is not configured; skipping server-side logout.");
+            return;
+        }
         try {
-            String url = properties.getUrl() + "/auth/v1/logout";
+            String url = baseUrl + "/auth/v1/logout";
             HttpHeaders headers = buildHeaders();
             headers.set("Authorization", "Bearer " + accessToken);
             restTemplate.exchange(url, HttpMethod.POST, new HttpEntity<>(headers), Void.class);
@@ -174,9 +179,17 @@ public class SupabaseAuthClient {
     }
 
     private void validateConfig() {
-        if (properties.getUrl() == null || properties.getUrl().isBlank()) {
+        String url = properties.getUrl();
+        String anonKey = properties.getAnonKey();
+
+        if (url == null || url.isBlank()) {
             throw new IllegalStateException(
-                    "Supabase is not configured. Set SUPABASE_URL and SUPABASE_ANON_KEY environment variables.");
+                    "Supabase is not configured: missing SUPABASE_URL environment variable.");
+        }
+
+        if (anonKey == null || anonKey.isBlank()) {
+            throw new IllegalStateException(
+                    "Supabase is not configured: missing SUPABASE_ANON_KEY environment variable.");
         }
     }
 
